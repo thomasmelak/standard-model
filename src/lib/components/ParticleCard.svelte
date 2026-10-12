@@ -5,6 +5,8 @@
 	import ParticleSymbol from './ParticleSymbol.svelte';
 	import ParticleViewer from './ParticleViewer.svelte';
 	import TypeBadge from './TypeBadge.svelte';
+	import { hint } from '#lib/game/collection.ts';
+	import { game } from '#lib/game/store.svelte.ts';
 	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
 	import {
 		bindingEnergyMeV,
@@ -44,10 +46,14 @@
 
 {#snippet chip(id: string)}
 	{@const p = getParticle(id)}
-	<button type="button" class="chip" title={p.name} onclick={() => onselect?.(id)}>
-		<Orb particle={p} size={16} />
-		<span><ParticleSymbol symbol={p.symbol} /></span>
-	</button>
+	{#if game.isDiscovered(id)}
+		<button type="button" class="chip" title={p.name} onclick={() => onselect?.(id)}>
+			<Orb particle={p} size={16} />
+			<span><ParticleSymbol symbol={p.symbol} /></span>
+		</button>
+	{:else}
+		<span class="chip locked" title="Undiscovered. {hint(p)}">?</span>
+	{/if}
 {/snippet}
 
 {#snippet badge(force: Force)}
@@ -387,6 +393,13 @@
 		border-radius: 999px;
 		background: var(--surface-2);
 		font-size: 0.85rem;
+	}
+
+	.chip.locked {
+		padding: 0.1rem 0.6rem;
+		border-style: dashed;
+		color: var(--muted);
+		cursor: help;
 	}
 
 	.chip:hover {
