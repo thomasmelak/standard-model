@@ -45,6 +45,10 @@
 	{@render children()}
 </main>
 
+<footer>
+	<a href={resolve('/design')}>Design system</a>
+</footer>
+
 <UnlockToast />
 
 <style>
@@ -55,8 +59,15 @@
 		justify-content: space-between;
 		gap: 0.75rem;
 		padding: 0.75rem 1rem;
-		border-bottom: 1px solid var(--border);
-		background: var(--surface);
+		/* A frosted glass bar that stays at the top as the page scrolls under it. */
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		border-bottom: 1px solid var(--glass-line);
+		background: linear-gradient(180deg, var(--glass-tint), var(--glass-tint-2));
+		-webkit-backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+		backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+		box-shadow: inset 0 -1px 0 var(--glass-edge);
 	}
 
 	.brand {
@@ -76,10 +87,20 @@
 		text-decoration: none;
 	}
 
+	footer {
+		padding: 1rem;
+		text-align: center;
+		font-size: 0.8rem;
+	}
+
+	footer a {
+		color: var(--muted);
+	}
+
 	.count {
 		margin-left: 0.25rem;
 		padding: 0 0.4rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--surface-2);
 		font-size: 0.75rem;
 		font-variant-numeric: tabular-nums;

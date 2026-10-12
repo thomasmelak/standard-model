@@ -9,6 +9,7 @@
 	import { hint } from '#lib/game/collection.ts';
 	import { game } from '#lib/game/store.svelte.ts';
 	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
+	import { Button, Chip, GlassCard, SectionLabel } from '#lib/ui/index.ts';
 	import {
 		bindingEnergyMeV,
 		dexNumber,
@@ -45,12 +46,12 @@
 {#snippet chip(id: string)}
 	{@const p = getParticle(id)}
 	{#if game.isDiscovered(id)}
-		<button type="button" class="chip" title={p.name} onclick={() => onselect?.(id)}>
+		<Chip title={p.name} onclick={() => onselect?.(id)}>
 			<Orb particle={p} size={16} />
 			<span><ParticleSymbol symbol={p.symbol} /></span>
-		</button>
+		</Chip>
 	{:else}
-		<span class="chip locked" title="Undiscovered. {hint(p)}">?</span>
+		<Chip locked title="Undiscovered. {hint(p)}">?</Chip>
 	{/if}
 {/snippet}
 
@@ -58,150 +59,151 @@
 	<TypeBadge {force} />
 {/snippet}
 
-<article class="card" style:--c={`var(--${particle.category})`}>
-	<header>
-		<div>
-			<span class="dex">{dexNumber(particle)}</span>
-			<h2>{particle.name}</h2>
-		</div>
-		<div class="types">
-			{#each types as force (force)}
-				{@render badge(force)}
-			{/each}
-		</div>
-	</header>
-
-	<div class="art" style:--glow={`var(--${particle.category})`}>
-		<ParticleStage {particle} size={190} {mode} {onselect} />
-		<span class="art-symbol"><ParticleSymbol symbol={particle.symbol} /></span>
-		<span class="art-tools">
-			<ViewModeToggle {particle} bind:mode />
-			<button
-				type="button"
-				class="expand"
-				title="Full screen"
-				aria-label="Show {particle.name} full screen"
-				onclick={() => (fullscreen = true)}>⤢</button
-			>
-		</span>
-	</div>
-
-	<ParticleViewer {particle} bind:open={fullscreen} bind:mode {onselect} />
-
-	<p class="tagline">
-		<span class="kind">{particle.category.replace('-', ' ')}</span>
-		{#if particle.elementary && particle.generation}· Generation {particle.generation}{/if}
-		· Spin {formatSpin(particle.spin)} · Charge {formatFraction(particle.charge3, 3)}
-	</p>
-	<p>{particle.description}</p>
-
-	<section>
-		<h3>Stats</h3>
-		<StatBars {particle} />
-	</section>
-
-	<section>
-		<h3>Interacts with</h3>
-		{#each interactions as i (i.force)}
-			<div class="interaction">
-				<div class="via">
-					{@render badge(i.force)}
-					<span class="muted"
-						>via {i.carriers
-							.map((id) => (id === 'W+' ? 'W±' : getParticle(id).symbol))
-							.join(', ')}</span
-					>
-				</div>
-				<div class="chips">
-					{#each i.partners as id (id)}
-						{@render chip(id)}
-					{/each}
-				</div>
+<GlassCard
+	as="article"
+	glow={`var(--${particle.category})`}
+	shine
+	style={`--c: var(--${particle.category});`}
+>
+	<div class="card">
+		<header>
+			<div>
+				<span class="dex">{dexNumber(particle)}</span>
+				<h2>{particle.name}</h2>
 			</div>
-		{:else}
-			<p class="muted">Nothing — it is bound up inside the composites it forms.</p>
-		{/each}
-	</section>
-
-	{#if moves.length}
-		<section>
-			<h3>Moves</h3>
-			<ul class="moves">
-				{#each moves as move (move.id)}
-					<li>
-						<div class="move-head">
-							<strong>{move.name}</strong>
-							{@render badge(move.force)}
-						</div>
-						<Equation inputs={move.inputs} outputs={move.outputs} />
-					</li>
+			<div class="types">
+				{#each types as force (force)}
+					{@render badge(force)}
 				{/each}
-			</ul>
-		</section>
-	{/if}
+			</div>
+		</header>
 
-	{#if evolution.from || evolution.into.length}
+		<div class="art on-dark" style:--glow={`var(--${particle.category})`}>
+			<ParticleStage {particle} size={190} {mode} {onselect} />
+			<span class="art-symbol"><ParticleSymbol symbol={particle.symbol} /></span>
+			<span class="art-tools">
+				<ViewModeToggle {particle} bind:mode />
+				<span class="expand">
+					<Button
+						icon
+						title="Full screen"
+						aria-label="Show {particle.name} full screen"
+						onclick={() => (fullscreen = true)}>⤢</Button
+					>
+				</span>
+			</span>
+		</div>
+
+		<ParticleViewer {particle} bind:open={fullscreen} bind:mode {onselect} />
+
+		<p class="tagline">
+			<span class="kind">{particle.category.replace('-', ' ')}</span>
+			{#if particle.elementary && particle.generation}· Generation {particle.generation}{/if}
+			· Spin {formatSpin(particle.spin)} · Charge {formatFraction(particle.charge3, 3)}
+		</p>
+		<p>{particle.description}</p>
+
 		<section>
-			<h3>Evolution</h3>
-			{#if evolution.from}
-				<div class="evo">
-					<span class="muted">Made from</span>
+			<SectionLabel>Stats</SectionLabel>
+			<StatBars {particle} />
+		</section>
+
+		<section>
+			<SectionLabel>Interacts with</SectionLabel>
+			{#each interactions as i (i.force)}
+				<div class="interaction">
+					<div class="via">
+						{@render badge(i.force)}
+						<span class="muted"
+							>via {i.carriers
+								.map((id) => (id === 'W+' ? 'W±' : getParticle(id).symbol))
+								.join(', ')}</span
+						>
+					</div>
 					<div class="chips">
-						{#each evolution.from as id, i (i)}
+						{#each i.partners as id (id)}
 							{@render chip(id)}
 						{/each}
 					</div>
 				</div>
-			{/if}
-			{#if evolution.into.length}
-				<div class="evo">
-					<span class="muted">Fuses into</span>
-					<div class="chips">
-						{#each evolution.into as c (c.id)}
-							{@render chip(c.id)}
-						{/each}
-					</div>
-				</div>
-			{/if}
+			{:else}
+				<p class="muted">Nothing — it is bound up inside the composites it forms.</p>
+			{/each}
 		</section>
-	{/if}
 
-	<details>
-		<summary>Field data</summary>
-		<dl class="data">
-			<dt>Mass</dt>
-			<dd>{formatMass(particle.massMeV)}</dd>
-			<dt>Baryon number</dt>
-			<dd>{formatFraction(particle.baryon3, 3)}</dd>
-			<dt>Lepton number</dt>
-			<dd>{formatFraction(leptonNumber)}</dd>
-			{#if !particle.elementary}
-				<dt>Held by</dt>
-				<dd>{particle.boundBy} force</dd>
-				<dt>Binding energy</dt>
-				<dd>{bindingEnergyMeV(particle).toFixed(3)} MeV</dd>
-			{/if}
-		</dl>
-	</details>
-</article>
+		{#if moves.length}
+			<section>
+				<SectionLabel>Moves</SectionLabel>
+				<ul class="moves">
+					{#each moves as move (move.id)}
+						<li>
+							<div class="move-head">
+								<strong>{move.name}</strong>
+								{@render badge(move.force)}
+							</div>
+							<Equation inputs={move.inputs} outputs={move.outputs} />
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+
+		{#if evolution.from || evolution.into.length}
+			<section>
+				<SectionLabel>Evolution</SectionLabel>
+				{#if evolution.from}
+					<div class="evo">
+						<span class="muted">Made from</span>
+						<div class="chips">
+							{#each evolution.from as id, i (i)}
+								{@render chip(id)}
+							{/each}
+						</div>
+					</div>
+				{/if}
+				{#if evolution.into.length}
+					<div class="evo">
+						<span class="muted">Fuses into</span>
+						<div class="chips">
+							{#each evolution.into as c (c.id)}
+								{@render chip(c.id)}
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</section>
+		{/if}
+
+		<details>
+			<summary>Field data</summary>
+			<dl class="data">
+				<dt>Mass</dt>
+				<dd>{formatMass(particle.massMeV)}</dd>
+				<dt>Baryon number</dt>
+				<dd>{formatFraction(particle.baryon3, 3)}</dd>
+				<dt>Lepton number</dt>
+				<dd>{formatFraction(leptonNumber)}</dd>
+				{#if !particle.elementary}
+					<dt>Held by</dt>
+					<dd>{particle.boundBy} force</dd>
+					<dt>Binding energy</dt>
+					<dd>{bindingEnergyMeV(particle).toFixed(3)} MeV</dd>
+				{/if}
+			</dl>
+		</details>
+	</div>
+</GlassCard>
 
 <style>
 	.card {
 		display: grid;
-		gap: 0.75rem;
-		padding: 1rem;
-		border: 3px solid var(--c);
-		border-radius: 18px;
-		background: linear-gradient(
-			160deg,
-			color-mix(in srgb, var(--c) 18%, var(--surface)),
-			var(--surface) 45%
-		);
-		box-shadow: 0 8px 28px color-mix(in srgb, var(--c) 20%, transparent);
+		gap: var(--space-3);
 	}
 
+	/* Name first; the type badges move under it when there isn't room beside it. */
 	header {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		align-items: flex-start;
 		gap: 0.5rem;
@@ -216,14 +218,7 @@
 	h2 {
 		margin: 0;
 		text-transform: capitalize;
-	}
-
-	h3 {
-		margin: 0 0 0.4rem;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--muted);
+		white-space: nowrap;
 	}
 
 	p {
@@ -242,7 +237,7 @@
 		position: relative;
 		display: grid;
 		place-items: center;
-		border-radius: 12px;
+		border-radius: var(--radius-md);
 		background: radial-gradient(
 			circle at 50% 45%,
 			color-mix(in srgb, var(--glow) 22%, #0b0f17),
@@ -263,19 +258,6 @@
 
 	.expand {
 		margin-left: auto;
-		width: 2rem;
-		height: 2rem;
-		border: 1px solid rgb(255 255 255 / 0.2);
-		border-radius: 8px;
-		background: rgb(0 0 0 / 0.45);
-		color: white;
-		font-size: 1rem;
-		line-height: 1;
-	}
-
-	.expand:hover,
-	.expand:focus-visible {
-		border-color: rgb(255 255 255 / 0.6);
 	}
 
 	.art-symbol {
@@ -298,7 +280,7 @@
 	}
 
 	section {
-		border-top: 1px solid var(--border);
+		border-top: 1px solid var(--glass-line);
 		padding-top: 0.6rem;
 	}
 
@@ -320,28 +302,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.3rem;
-	}
-
-	.chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		padding: 0.1rem 0.5rem 0.1rem 0.2rem;
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		background: var(--surface-2);
-		font-size: 0.85rem;
-	}
-
-	.chip.locked {
-		padding: 0.1rem 0.6rem;
-		border-style: dashed;
-		color: var(--muted);
-		cursor: help;
-	}
-
-	.chip:hover {
-		border-color: var(--accent);
 	}
 
 	.moves {

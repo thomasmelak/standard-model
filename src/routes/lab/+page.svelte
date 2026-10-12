@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Equation from '#lib/components/Equation.svelte';
 	import { draggable } from '#lib/dnd.ts';
+	import { Button, GlassCard } from '#lib/ui/index.ts';
 	import { game } from '#lib/game/store.svelte.ts';
 	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
@@ -166,8 +167,8 @@
 </p>
 
 <div class="layout">
-	<section class="panel palette" data-drop="palette">
-		<header>
+	<GlassCard as="section" data-drop="palette">
+		<header class="palette-head">
 			<h2>Particles</h2>
 			<label><input type="checkbox" bind:checked={showAntiparticles} /> Antiparticles</label>
 		</header>
@@ -185,10 +186,10 @@
 				{/each}
 			</div>
 		{/each}
-	</section>
+	</GlassCard>
 
 	<div class="right">
-		<section class="panel">
+		<GlassCard as="section">
 			<h2>Workbench</h2>
 			<div class="bench" data-drop="bench" aria-live="polite">
 				{#each bench as item (item.key)}
@@ -201,12 +202,15 @@
 							selected={inspectedId === item.id}
 							onclick={() => (inspectedId = item.id)}
 						/>
-						<button
-							type="button"
-							class="remove"
-							aria-label="Remove {getParticle(item.id).name}"
-							onclick={() => remove(item.key)}>×</button
-						>
+						<span class="remove">
+							<Button
+								icon
+								size="sm"
+								variant="ghost"
+								aria-label="Remove {getParticle(item.id).name}"
+								onclick={() => remove(item.key)}>×</Button
+							>
+						</span>
 					</div>
 				{:else}
 					<p class="muted">
@@ -222,25 +226,23 @@
 			</p>
 
 			<div class="actions">
-				<button type="button" class="btn primary" disabled={bench.length < 2} onclick={doCombine}>
+				<Button variant="primary" disabled={bench.length < 2} onclick={doCombine}>
 					Combine{composite ? ` → ${composite.symbol}` : ''}
-				</button>
-				<button type="button" class="btn" disabled={!splittable} onclick={doSplit}>Split</button>
-				<button type="button" class="btn" disabled={!reaction} onclick={doReact}>
+				</Button>
+				<Button disabled={!splittable} onclick={doSplit}>Split</Button>
+				<Button disabled={!reaction} onclick={doReact}>
 					{reaction ? reaction.name : 'React'}
-				</button>
-				<button type="button" class="btn" disabled={!bench.length} onclick={() => setBench([])}>
-					Clear
-				</button>
+				</Button>
+				<Button disabled={!bench.length} onclick={() => setBench([])}>Clear</Button>
 			</div>
-		</section>
+		</GlassCard>
 
 		{#if inspectedId}
 			<ParticleCard particle={getParticle(inspectedId)} onselect={(id) => (inspectedId = id)} />
 		{/if}
 
 		{#if log.length}
-			<section class="panel">
+			<GlassCard as="section">
 				<h2>Lab notebook</h2>
 				<ol class="log">
 					{#each log as entry (entry.key)}
@@ -269,7 +271,7 @@
 						</li>
 					{/each}
 				</ol>
-			</section>
+			</GlassCard>
 		{/if}
 	</div>
 </div>
@@ -287,7 +289,7 @@
 		gap: 1rem;
 	}
 
-	.palette header {
+	.palette-head {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -352,12 +354,8 @@
 
 	.remove {
 		position: absolute;
-		top: 0.2rem;
-		right: 0.3rem;
-		border: none;
-		background: none;
-		color: var(--muted);
-		font-size: 1rem;
+		top: 0.1rem;
+		right: 0.1rem;
 	}
 
 	.totals {

@@ -11,6 +11,7 @@ src/
 │   ├── lab/                 /lab           The Particle Lab
 │   └── interactions/        /interactions  The four interactions and who feels them
 └── lib/
+    ├── ui/                  Design system components (GlassCard, Button, …) — docs/DESIGN_SYSTEM.md
     ├── components/          Svelte UI: ParticleCard, ParticleTile, Orb, OrbCanvas, ThemeToggle, …
     └── physics/             Framework-free TypeScript, unit-tested with Vitest
         ├── types.ts         Particle, Reaction, Force, quantum numbers
@@ -87,7 +88,7 @@ real physics in `stats.ts`, scaled to 0–100:
 
 - The ⤢ button on a card opens `ParticleViewer.svelte`: a modal `<dialog>` with a large live orb,
   which also requests browser full screen where allowed, with the stat bars (`StatBars.svelte`,
-  shared with the card) beside it. ‹ › buttons, the ← → keys and horizontal swipes step through
+  shared with the card) beside it. ‹ › buttons, the ← → keys and horizontal swipes (on the orb's stage or the stats card) step through
   discovered particles in dex order, wrapping around. In landscape the stats sit beside the orb
   (30vw, at least 240px); in portrait they stack below it (90vw), on a frosted-glass card. Dragging inside the orb orbits the
   camera around it (the shader's `view` uniform rotates the fog, while the light stays put), with

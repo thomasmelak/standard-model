@@ -13,7 +13,7 @@ to GitHub Pages.
   particles feel each one, and example processes.
 - Light and dark themes (follows your OS; toggle in the header).
 
-See [docs/GAMIFICATION.md](docs/GAMIFICATION.md) for the game roadmap and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the code is organised, the physics model
+See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) for the glass design system (live at `/design`), [docs/GAMIFICATION.md](docs/GAMIFICATION.md) for the game roadmap and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the code is organised, the physics model
 and the deployment pipeline.
 
 ## Development

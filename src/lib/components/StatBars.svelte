@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ProgressBar } from '#lib/ui/index.ts';
 	import { particleStats, type Particle } from '#lib/physics/index.ts';
 
 	// The card's stat block: one bar per stat, what it means physically, and the total.
@@ -14,7 +15,7 @@
 	{#each stats as s (s.key)}
 		<dt title={s.meaning}>{s.label}</dt>
 		<dd title={s.meaning}>
-			<span class="bar"><span style:width={`${s.value}%`}></span></span>
+			<ProgressBar value={s.value} label={s.label} />
 			<span class="value">{s.value}</span>
 			<span class="meaning">{s.meaning}</span>
 		</dd>
@@ -45,21 +46,6 @@
 		align-items: center;
 		gap: 0 0.5rem;
 		margin: 0;
-	}
-
-	.bar {
-		height: 0.55rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, currentColor 12%, transparent);
-		overflow: hidden;
-	}
-
-	.bar span {
-		display: block;
-		height: 100%;
-		border-radius: inherit;
-		background: linear-gradient(90deg, color-mix(in srgb, var(--c) 60%, white), var(--c));
-		transition: width 0.4s ease-out;
 	}
 
 	.value {

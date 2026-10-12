@@ -3,6 +3,7 @@
 	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
 	import TypeBadge from '#lib/components/TypeBadge.svelte';
+	import { Button, GlassCard, ProgressBar } from '#lib/ui/index.ts';
 	import { resolve } from '$app/paths';
 	import { BADGES, badgeProgress } from '#lib/game/collection.ts';
 	import { game } from '#lib/game/store.svelte.ts';
@@ -43,35 +44,40 @@
 	you run is recorded as a move.
 </p>
 
-<section class="panel progress">
+<GlassCard as="section" class="dex-progress">
 	<div class="progress-head">
 		<strong>{game.progress.found} / {game.progress.total} discovered</strong>
 		<span class="muted">{percent}%</span>
 	</div>
-	<div
-		class="bar"
-		role="progressbar"
-		aria-valuemin="0"
-		aria-valuemax={game.progress.total}
-		aria-valuenow={game.progress.found}
-		aria-label="Dex progress"
-	>
-		<span style:width={`${percent}%`}></span>
-	</div>
+	<ProgressBar
+		value={game.progress.found}
+		max={game.progress.total}
+		height="0.7rem"
+		fill="linear-gradient(90deg, var(--quark), var(--lepton), var(--electromagnetic))"
+		label="Dex progress"
+	/>
 
 	<ul class="badges">
 		{#each BADGES as badge (badge.id)}
 			{@const p = badgeProgress(game.collection, badge)}
-			<li class:earned={p.found === p.total}>
-				<span class="medal" aria-hidden="true">{p.found === p.total ? '🏅' : '🔒'}</span>
-				<div>
-					<strong>{badge.name}</strong>
-					<span class="muted">{badge.description} {p.found}/{p.total}</span>
+			<GlassCard
+				as="li"
+				padding="sm"
+				ghost={p.found !== p.total}
+				glow={p.found === p.total ? 'var(--electromagnetic)' : undefined}
+				shine={p.found === p.total}
+			>
+				<div class="badge-row">
+					<span class="medal" aria-hidden="true">{p.found === p.total ? '🏅' : '🔒'}</span>
+					<div>
+						<strong>{badge.name}</strong>
+						<span class="muted">{badge.description} {p.found}/{p.total}</span>
+					</div>
 				</div>
-			</li>
+			</GlassCard>
 		{/each}
 	</ul>
-</section>
+</GlassCard>
 
 <div class="layout">
 	<div>
@@ -93,7 +99,11 @@
 		<h2>Moves</h2>
 		<ul class="moves">
 			{#each reactions as r (r.id)}
-				<li class="panel" class:locked={!game.collection.reactions.includes(r.id)}>
+				<GlassCard
+					as="li"
+					ghost={!game.collection.reactions.includes(r.id)}
+					glow={game.collection.reactions.includes(r.id) ? `var(--${r.force})` : undefined}
+				>
 					{#if game.collection.reactions.includes(r.id)}
 						<div class="move-head"><strong>{r.name}</strong><TypeBadge force={r.force} /></div>
 						<Equation inputs={r.inputs} outputs={r.outputs} />
@@ -105,11 +115,11 @@
 								: `${r.inputs.length} particles`}.
 						</span>
 					{/if}
-				</li>
+				</GlassCard>
 			{/each}
 		</ul>
 
-		<button type="button" class="btn reset" onclick={reset}>Reset progress</button>
+		<div class="reset"><Button onclick={reset}>Reset progress</Button></div>
 	</div>
 
 	<div class="side">
@@ -118,7 +128,7 @@
 </div>
 
 <style>
-	.progress {
+	:global(.dex-progress) {
 		display: grid;
 		gap: 0.6rem;
 		margin-bottom: 1.5rem;
@@ -127,21 +137,6 @@
 	.progress-head {
 		display: flex;
 		justify-content: space-between;
-	}
-
-	.bar {
-		height: 0.7rem;
-		border-radius: 999px;
-		background: var(--surface-2);
-		overflow: hidden;
-	}
-
-	.bar span {
-		display: block;
-		height: 100%;
-		border-radius: inherit;
-		background: linear-gradient(90deg, var(--quark), var(--lepton), var(--electromagnetic));
-		transition: width 0.6s ease-out;
 	}
 
 	.badges {
@@ -153,23 +148,13 @@
 		list-style: none;
 	}
 
-	.badges li {
+	.badge-row {
 		display: flex;
 		align-items: center;
 		gap: 0.6rem;
-		padding: 0.5rem 0.7rem;
-		border: 1px dashed var(--border);
-		border-radius: 10px;
-		opacity: 0.75;
 	}
 
-	.badges li.earned {
-		border-style: solid;
-		border-color: var(--electromagnetic);
-		opacity: 1;
-	}
-
-	.badges div {
+	.badge-row div {
 		display: grid;
 		font-size: 0.85rem;
 	}
@@ -207,11 +192,6 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-	}
-
-	.moves li.locked {
-		border-style: dashed;
-		background: var(--surface-2);
 	}
 
 	.move-head {

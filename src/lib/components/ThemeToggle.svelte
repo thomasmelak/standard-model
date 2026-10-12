@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { Button } from '#lib/ui/index.ts';
 
 	type Theme = 'light' | 'dark';
 
@@ -25,27 +26,11 @@
 	}
 </script>
 
-<button
-	type="button"
-	class="toggle"
+<Button
+	icon
 	onclick={toggle}
 	aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
 	title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
 >
 	{theme === 'dark' ? '☀' : '☾'}
-</button>
-
-<style>
-	.toggle {
-		width: 2rem;
-		height: 2rem;
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		background: var(--surface-2);
-		line-height: 1;
-	}
-
-	.toggle:hover {
-		border-color: var(--accent);
-	}
-</style>
+</Button>

@@ -5,6 +5,7 @@
 	import TypeBadge from './TypeBadge.svelte';
 	import { game } from '#lib/game/store.svelte.ts';
 	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
+	import { Button, GlassCard, SectionLabel } from '#lib/ui/index.ts';
 	import {
 		dexNumber,
 		formatFraction,
@@ -40,7 +41,8 @@
 		Math.max(200, Math.min(width - (wide ? column + 200 : 168), height - (wide ? 160 : 320), 720))
 	);
 
-	// Swipe left for the next particle, right for the previous one.
+	// Swipe left for the next particle, right for the previous one, anywhere on the
+	// orb's stage or the stats card. Drags on the orb itself rotate it instead.
 	let swipe: { x: number; y: number; id: number } | null = null;
 
 	function onpointerdown(e: PointerEvent) {
@@ -103,6 +105,7 @@
 <svelte:document {onfullscreenchange} />
 
 <dialog
+	class="on-dark"
 	bind:this={dialog}
 	{onclose}
 	aria-label="{particle.name}, full screen"
@@ -115,37 +118,37 @@
 				<span class="dex">{dexNumber(particle)}</span>
 				<h2>{particle.name}</h2>
 			</div>
-			<button type="button" class="close" aria-label="Close" onclick={() => (open = false)}
-				>✕</button
-			>
+			<Button icon aria-label="Close" onclick={() => (open = false)}>✕</Button>
 		</header>
 
-		<div class="body" class:wide style:--column={`${column}px`}>
-			<div
-				class="stage swipe-area"
-				role="group"
-				aria-label={canStep ? `${particle.name}. Swipe to browse.` : particle.name}
-				{onpointerdown}
-				{onpointerup}
-				onpointercancel={() => (swipe = null)}
-			>
+		<div
+			class="body swipe-area"
+			class:wide
+			style:--column={`${column}px`}
+			role="group"
+			aria-label={canStep ? `${particle.name}. Swipe to browse.` : particle.name}
+			{onpointerdown}
+			{onpointerup}
+			onpointercancel={() => (swipe = null)}
+		>
+			<div class="stage">
 				{#if canStep}
-					<button
-						type="button"
-						class="step"
+					<Button
+						icon
+						size="lg"
 						aria-label="Previous: {prev?.name}"
 						title="Previous: {prev?.name} (←)"
-						onclick={() => step(prev)}>‹</button
+						onclick={() => step(prev)}>‹</Button
 					>
 				{/if}
 				<ParticleStage {particle} size={stageSize} {mode} {onselect} rotatable />
 				{#if canStep}
-					<button
-						type="button"
-						class="step"
+					<Button
+						icon
+						size="lg"
 						aria-label="Next: {next?.name}"
 						title="Next: {next?.name} (→)"
-						onclick={() => step(next)}>›</button
+						onclick={() => step(next)}>›</Button
 					>
 				{/if}
 			</div>
@@ -159,15 +162,15 @@
 					)}
 				</p>
 				<p class="description">{particle.description}</p>
-				<section class="stats-panel">
+				<GlassCard as="section" glow="var(--c)" shine class="stats-card">
 					<div class="types" aria-label="Interactions">
 						{#each particleTypes(particle) as force (force)}
 							<TypeBadge {force} />
 						{/each}
 					</div>
-					<h3>Stats</h3>
+					<SectionLabel>Stats</SectionLabel>
 					<StatBars {particle} />
-				</section>
+				</GlassCard>
 				{#if canStep}
 					<p class="hint">
 						Drag the orb to rotate · Swipe or ← → to browse · {index + 1} of {sequence.length} discovered
@@ -216,7 +219,7 @@
 
 	.dex {
 		font-size: 0.85rem;
-		color: rgb(255 255 255 / 0.6);
+		color: var(--muted);
 	}
 
 	h2 {
@@ -232,22 +235,9 @@
 		margin-bottom: 0.75rem;
 	}
 
-	.close {
-		width: 2.5rem;
-		height: 2.5rem;
-		border: 1px solid rgb(255 255 255 / 0.25);
-		border-radius: 50%;
-		background: rgb(0 0 0 / 0.4);
-		color: white;
-		font-size: 1.1rem;
-	}
-
-	.close:hover,
-	.close:focus-visible {
-		border-color: white;
-	}
-
+	/* The orb and the stats card both take swipes; vertical scrolling stays native. */
 	.body {
+		touch-action: pan-y;
 		flex: 1;
 		display: grid;
 		grid-template-rows: auto auto;
@@ -265,31 +255,11 @@
 	}
 
 	.stage {
-		/* Vertical scrolling stays native; horizontal drags are swipes. */
-		touch-action: pan-y;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
 		min-height: 0;
-	}
-
-	.step {
-		flex: none;
-		width: 3rem;
-		height: 3rem;
-		border: 1px solid rgb(255 255 255 / 0.25);
-		border-radius: 50%;
-		background: rgb(0 0 0 / 0.4);
-		color: white;
-		font-size: 1.8rem;
-		line-height: 1;
-	}
-
-	.step:hover,
-	.step:focus-visible {
-		border-color: white;
-		background: rgb(255 255 255 / 0.1);
 	}
 
 	.info {
@@ -312,115 +282,8 @@
 		color: rgb(255 255 255 / 0.8);
 	}
 
-	/* A pane of glass: frosted, lit along its top edge, with a glint that travels
-	   around the rim and a sheen that sweeps across the surface now and then. */
-	.stats-panel {
-		position: relative;
-		isolation: isolate;
-		overflow: hidden;
+	.info :global(.stats-card) {
 		width: 100%;
-		padding: 0.9rem 1.1rem;
-		border-radius: 16px;
-		background:
-			radial-gradient(120% 70% at 0% 0%, rgb(255 255 255 / 0.2), transparent 55%),
-			linear-gradient(
-				135deg,
-				rgb(255 255 255 / 0.12),
-				rgb(255 255 255 / 0.04) 45%,
-				color-mix(in srgb, var(--c) 14%, transparent)
-			);
-		-webkit-backdrop-filter: blur(14px) saturate(140%);
-		backdrop-filter: blur(14px) saturate(140%);
-		box-shadow:
-			inset 0 1px 0 rgb(255 255 255 / 0.35),
-			inset 0 -1px 0 rgb(255 255 255 / 0.06),
-			0 12px 32px rgb(0 0 0 / 0.4),
-			0 0 28px color-mix(in srgb, var(--c) 22%, transparent);
-	}
-
-	/* The rim: a 1px gradient ring (masked to the border) with a bright spot that circles it. */
-	.stats-panel::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		border-radius: inherit;
-		padding: 2px;
-		background: conic-gradient(
-			from var(--glint),
-			rgb(255 255 255 / 0.12),
-			rgb(255 255 255 / 0.6) 4%,
-			white 9%,
-			color-mix(in srgb, var(--c) 50%, white) 13%,
-			rgb(255 255 255 / 0.12) 22%,
-			rgb(255 255 255 / 0.12) 48%,
-			rgb(255 255 255 / 0.7) 55%,
-			rgb(255 255 255 / 0.12) 64%
-		);
-		mask:
-			linear-gradient(#000 0 0) content-box,
-			linear-gradient(#000 0 0);
-		-webkit-mask-composite: xor;
-		mask-composite: exclude;
-		/* Bloom around the bright parts of the rim, so the glint shines. */
-		filter: drop-shadow(0 0 2px rgb(255 255 255 / 0.9))
-			drop-shadow(0 0 6px color-mix(in srgb, var(--c) 80%, white));
-		animation: glint 6s linear infinite;
-		pointer-events: none;
-	}
-
-	.stats-panel::after {
-		content: '';
-		position: absolute;
-		inset: -50% -60%;
-		background: linear-gradient(
-			115deg,
-			transparent 42%,
-			rgb(255 255 255 / 0.1) 49%,
-			rgb(255 255 255 / 0.18) 50%,
-			rgb(255 255 255 / 0.1) 51%,
-			transparent 58%
-		);
-		transform: translateX(-60%);
-		animation: sheen 7s ease-in-out infinite;
-		pointer-events: none;
-	}
-
-	@property --glint {
-		syntax: '<angle>';
-		inherits: false;
-		initial-value: 0deg;
-	}
-
-	@keyframes glint {
-		to {
-			--glint: 360deg;
-		}
-	}
-
-	@keyframes sheen {
-		0%,
-		60% {
-			transform: translateX(-60%);
-		}
-		100% {
-			transform: translateX(60%);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.stats-panel::before,
-		.stats-panel::after {
-			animation: none;
-		}
-	}
-
-	h3 {
-		margin: 0 0 0.5rem;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: rgb(255 255 255 / 0.6);
 	}
 
 	.hint {
