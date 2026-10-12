@@ -1,0 +1,155 @@
+:root {
+	color-scheme: light;
+	--bg: #f6f8fa;
+	--surface: #ffffff;
+	--surface-2: #eef1f4;
+	--border: #d0d7de;
+	--text: #1f2328;
+	--muted: #59636e;
+	--accent: #0969da;
+	--accent-strong: #0969da;
+	--on-accent: #ffffff;
+	--ok: #1a7f37;
+	--bad: #cf222e;
+
+	--quark: #8250df;
+	--lepton: #1a7f37;
+	--gauge-boson: #bc4c00;
+	--scalar-boson: #9a6700;
+	--hadron: #0969da;
+	--nucleus: #1b7c83;
+	--atom: #bf3989;
+
+	--strong: #cf222e;
+	--electromagnetic: #9a6700;
+	--weak: #0969da;
+	--higgs: #8250df;
+
+	font-family:
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		sans-serif;
+	line-height: 1.5;
+}
+
+/* Dark theme: follows the OS unless the user picked light, or when they picked dark. */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+		--bg: #0d1117;
+		--surface: #161b22;
+		--surface-2: #1f2630;
+		--border: #30363d;
+		--text: #e6edf3;
+		--muted: #8b949e;
+		--accent: #58a6ff;
+		--accent-strong: #1f6feb;
+		--on-accent: #ffffff;
+		--ok: #3fb950;
+		--bad: #f85149;
+
+		--quark: #a371f7;
+		--lepton: #3fb950;
+		--gauge-boson: #f0883e;
+		--scalar-boson: #e3b341;
+		--hadron: #58a6ff;
+		--nucleus: #39c5cf;
+		--atom: #db61a2;
+
+		--strong: #f85149;
+		--electromagnetic: #e3b341;
+		--weak: #58a6ff;
+		--higgs: #a371f7;
+	}
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--bg: #0d1117;
+	--surface: #161b22;
+	--surface-2: #1f2630;
+	--border: #30363d;
+	--text: #e6edf3;
+	--muted: #8b949e;
+	--accent: #58a6ff;
+	--accent-strong: #1f6feb;
+	--on-accent: #ffffff;
+	--ok: #3fb950;
+	--bad: #f85149;
+
+	--quark: #a371f7;
+	--lepton: #3fb950;
+	--gauge-boson: #f0883e;
+	--scalar-boson: #e3b341;
+	--hadron: #58a6ff;
+	--nucleus: #39c5cf;
+	--atom: #db61a2;
+
+	--strong: #f85149;
+	--electromagnetic: #e3b341;
+	--weak: #58a6ff;
+	--higgs: #a371f7;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+}
+
+a {
+	color: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.2;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+}
+
+.btn {
+	padding: 0.45rem 0.9rem;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--surface-2);
+}
+
+.btn:hover:not(:disabled) {
+	border-color: var(--accent);
+}
+
+.btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.btn.primary {
+	background: var(--accent-strong);
+	border-color: var(--accent-strong);
+	color: var(--on-accent);
+}
+
+.panel {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+.muted {
+	color: var(--muted);
+}
