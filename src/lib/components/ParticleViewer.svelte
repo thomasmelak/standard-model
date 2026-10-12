@@ -31,12 +31,32 @@
 	let width = $state(1024);
 	let height = $state(768);
 
-	// Side by side (orb | stats) on wide screens, stacked on narrow ones.
-	const wide = $derived(width >= 900);
-	// Leave room for the header, caption, arrows and (when wide) the stats column.
+	// Landscape: orb and stats side by side, stats 20vw wide. Portrait: stacked, stats 80vw.
+	const wide = $derived(width > height);
+	// The stats column never drops below 240px, where its bars stop being readable.
+	const column = $derived(Math.max(width * 0.2, 240));
+	// Leave room for the header, arrows and (in landscape) the stats column.
 	const stageSize = $derived(
-		Math.max(220, Math.min(width - (wide ? 480 : 168), height - (wide ? 220 : 320), 720))
+		Math.max(200, Math.min(width - (wide ? column + 200 : 168), height - (wide ? 160 : 320), 720))
 	);
+
+	// Swipe left for the next particle, right for the previous one.
+	let swipe: { x: number; y: number; id: number } | null = null;
+
+	function onpointerdown(e: PointerEvent) {
+		if (e.pointerType === 'mouse') return;
+		swipe = { x: e.clientX, y: e.clientY, id: e.pointerId };
+	}
+
+	function onpointerup(e: PointerEvent) {
+		if (!swipe || e.pointerId !== swipe.id) return;
+		const dx = e.clientX - swipe.x;
+		const dy = e.clientY - swipe.y;
+		swipe = null;
+		// Mostly sideways and far enough to be deliberate.
+		if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+		step(dx < 0 ? next : prev);
+	}
 
 	// Arrows and ←/→ step through the discovered particles in dex order, wrapping around.
 	const sequence = $derived(allParticles.filter((p) => game.isDiscovered(p.id)));
@@ -105,8 +125,15 @@
 			>
 		</header>
 
-		<div class="body" class:wide>
-			<div class="stage">
+		<div class="body" class:wide style:--column={`${column}px`}>
+			<div
+				class="stage swipe-area"
+				role="group"
+				aria-label={canStep ? `${particle.name}. Swipe to browse.` : particle.name}
+				{onpointerdown}
+				{onpointerup}
+				onpointercancel={() => (swipe = null)}
+			>
 				{#if canStep}
 					<button
 						type="button"
@@ -142,7 +169,7 @@
 					<StatBars {particle} />
 				</section>
 				{#if canStep}
-					<p class="hint">← → to browse · {index + 1} of {sequence.length} discovered</p>
+					<p class="hint">Swipe or ← → to browse · {index + 1} of {sequence.length} discovered</p>
 				{/if}
 			</aside>
 		</div>
@@ -226,13 +253,17 @@
 		overflow-y: auto;
 	}
 
+	/* In landscape the orb stays centred on screen; a tall stats column scrolls on its own. */
 	.body.wide {
-		grid-template-columns: minmax(0, 1fr) 380px;
-		grid-template-rows: none;
+		grid-template-columns: minmax(0, 1fr) var(--column);
+		grid-template-rows: minmax(0, 1fr);
 		align-items: center;
+		overflow: hidden;
 	}
 
 	.stage {
+		/* Vertical scrolling stays native; horizontal drags are swipes. */
+		touch-action: pan-y;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -263,8 +294,14 @@
 		gap: 0.6rem;
 		align-content: start;
 		justify-items: start;
-		max-width: 60ch;
+		width: 80vw;
 		margin: 0 auto;
+	}
+
+	.wide .info {
+		width: 100%;
+		max-height: 100%;
+		overflow-y: auto;
 	}
 
 	.info p {
