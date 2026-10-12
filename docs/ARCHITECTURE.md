@@ -89,7 +89,7 @@ real physics in `stats.ts`, scaled to 0–100:
   which also requests browser full screen where allowed, with the stat bars (`StatBars.svelte`,
   shared with the card) beside it. ‹ › buttons, the ← → keys and horizontal swipes step through
   discovered particles in dex order, wrapping around. In landscape the stats sit beside the orb
-  (20vw, at least 240px); in portrait they stack below it (80vw). Dragging inside the orb orbits the
+  (30vw, at least 240px); in portrait they stack below it (90vw), on a frosted-glass card. Dragging inside the orb orbits the
   camera around it (the shader's `view` uniform rotates the fog, while the light stays put), with
   momentum on release; double-click resets. Drags outside the sphere stay swipes. Esc or ✕ closes it.
 - Composite particles get a view toggle (`ViewModeToggle.svelte`): **Orb**, **Parts** (direct

@@ -31,10 +31,10 @@
 	let width = $state(1024);
 	let height = $state(768);
 
-	// Landscape: orb and stats side by side, stats 20vw wide. Portrait: stacked, stats 80vw.
+	// Landscape: orb and stats side by side, stats 30vw wide. Portrait: stacked, stats 90vw.
 	const wide = $derived(width > height);
 	// The stats column never drops below 240px, where its bars stop being readable.
-	const column = $derived(Math.max(width * 0.2, 240));
+	const column = $derived(Math.max(width * 0.3, 240));
 	// Leave room for the header, arrows and (in landscape) the stats column.
 	const stageSize = $derived(
 		Math.max(200, Math.min(width - (wide ? column + 200 : 168), height - (wide ? 160 : 320), 720))
@@ -297,7 +297,7 @@
 		gap: 0.6rem;
 		align-content: start;
 		justify-items: start;
-		width: 80vw;
+		width: 90vw;
 		margin: 0 auto;
 	}
 
@@ -312,12 +312,107 @@
 		color: rgb(255 255 255 / 0.8);
 	}
 
+	/* A pane of glass: frosted, lit along its top edge, with a glint that travels
+	   around the rim and a sheen that sweeps across the surface now and then. */
 	.stats-panel {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
 		width: 100%;
-		padding: 0.8rem 1rem;
-		border: 1px solid rgb(255 255 255 / 0.15);
-		border-radius: 12px;
-		background: rgb(0 0 0 / 0.35);
+		padding: 0.9rem 1.1rem;
+		border-radius: 16px;
+		background:
+			radial-gradient(120% 70% at 0% 0%, rgb(255 255 255 / 0.2), transparent 55%),
+			linear-gradient(
+				135deg,
+				rgb(255 255 255 / 0.12),
+				rgb(255 255 255 / 0.04) 45%,
+				color-mix(in srgb, var(--c) 14%, transparent)
+			);
+		-webkit-backdrop-filter: blur(14px) saturate(140%);
+		backdrop-filter: blur(14px) saturate(140%);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.35),
+			inset 0 -1px 0 rgb(255 255 255 / 0.06),
+			0 12px 32px rgb(0 0 0 / 0.4),
+			0 0 28px color-mix(in srgb, var(--c) 22%, transparent);
+	}
+
+	/* The rim: a 1px gradient ring (masked to the border) with a bright spot that circles it. */
+	.stats-panel::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border-radius: inherit;
+		padding: 2px;
+		background: conic-gradient(
+			from var(--glint),
+			rgb(255 255 255 / 0.12),
+			rgb(255 255 255 / 0.6) 4%,
+			white 9%,
+			color-mix(in srgb, var(--c) 50%, white) 13%,
+			rgb(255 255 255 / 0.12) 22%,
+			rgb(255 255 255 / 0.12) 48%,
+			rgb(255 255 255 / 0.7) 55%,
+			rgb(255 255 255 / 0.12) 64%
+		);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		/* Bloom around the bright parts of the rim, so the glint shines. */
+		filter: drop-shadow(0 0 2px rgb(255 255 255 / 0.9))
+			drop-shadow(0 0 6px color-mix(in srgb, var(--c) 80%, white));
+		animation: glint 6s linear infinite;
+		pointer-events: none;
+	}
+
+	.stats-panel::after {
+		content: '';
+		position: absolute;
+		inset: -50% -60%;
+		background: linear-gradient(
+			115deg,
+			transparent 42%,
+			rgb(255 255 255 / 0.1) 49%,
+			rgb(255 255 255 / 0.18) 50%,
+			rgb(255 255 255 / 0.1) 51%,
+			transparent 58%
+		);
+		transform: translateX(-60%);
+		animation: sheen 7s ease-in-out infinite;
+		pointer-events: none;
+	}
+
+	@property --glint {
+		syntax: '<angle>';
+		inherits: false;
+		initial-value: 0deg;
+	}
+
+	@keyframes glint {
+		to {
+			--glint: 360deg;
+		}
+	}
+
+	@keyframes sheen {
+		0%,
+		60% {
+			transform: translateX(-60%);
+		}
+		100% {
+			transform: translateX(60%);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.stats-panel::before,
+		.stats-panel::after {
+			animation: none;
+		}
 	}
 
 	h3 {
