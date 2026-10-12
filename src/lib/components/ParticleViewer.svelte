@@ -115,11 +115,6 @@
 				<span class="dex">{dexNumber(particle)}</span>
 				<h2>{particle.name}</h2>
 			</div>
-			<div class="types">
-				{#each particleTypes(particle) as force (force)}
-					<TypeBadge {force} />
-				{/each}
-			</div>
 			<button type="button" class="close" aria-label="Close" onclick={() => (open = false)}
 				>✕</button
 			>
@@ -165,6 +160,11 @@
 				</p>
 				<p class="description">{particle.description}</p>
 				<section class="stats-panel">
+					<div class="types" aria-label="Interactions">
+						{#each particleTypes(particle) as force (force)}
+							<TypeBadge {force} />
+						{/each}
+					</div>
 					<h3>Stats</h3>
 					<StatBars {particle} />
 				</section>
@@ -227,6 +227,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.3rem;
+		margin-bottom: 0.75rem;
 	}
 
 	.close {
