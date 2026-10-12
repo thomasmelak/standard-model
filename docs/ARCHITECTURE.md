@@ -81,15 +81,20 @@ real physics in `stats.ts`, scaled to 0–100:
 
 ### Orbs
 
-Each particle is drawn as a glowing orb coloured by its category. Heavier particles are larger,
-unstable ones pulse faster, antiparticles have a dark core and bright rim, and composites have
-their constituents orbiting them.
+Each particle is drawn as a translucent glass sphere filled with glowing fog and energy filaments
+around a bright core, coloured by its category. Heavier particles are larger, unstable ones swirl
+faster with more chaotic filaments and sparks, antiparticles have a dark hollow core inside a bright
+membrane, and composites have their constituents orbiting them.
 
-- `OrbCanvas.svelte` renders the card's orb in WebGL: one fragment shader ray-casts a lit sphere
-  with an animated noise "plasma" surface, rim light and halo. It falls back to the CSS orb without
-  WebGL, and draws a still frame under `prefers-reduced-motion`.
-- `Orb.svelte` is a CSS-only orb (layered gradients and animations) for tiles and chips, where
-  dozens appear at once and a WebGL context each would exceed browser limits.
+- `src/lib/orb/shader.ts` holds the one fragment shader (GLSL ES 1.00): it raymarches swirling fog
+  and filaments inside the sphere, then adds a glass shell (fresnel rim, highlights behind the
+  `highlight` uniform) and a halo that fades to transparent. `params.ts` maps a particle to its
+  uniforms (radius, turbulence, anti, a per-particle seed); `renderer.ts` compiles and draws it.
+- `OrbCanvas.svelte` animates it live on the card, falls back to the CSS orb without WebGL, and draws
+  a still frame under `prefers-reduced-motion`.
+- `Orb.svelte` (tiles and chips) shows still frames from one shared offscreen WebGL context
+  (`snapshots.ts`, cached per particle and theme), turned slowly by CSS under a static glass glint, so
+  dozens of orbs never need dozens of WebGL contexts. Orbs redraw when the theme changes.
 
 ## Themes
 
