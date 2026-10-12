@@ -59,8 +59,7 @@
 			<dt>Made of</dt>
 			<dd>
 				{#each particle.constituents as id, i (i)}
-					{#if i > 0}&nbsp;+
-					{/if}<ParticleSymbol symbol={getParticle(id).symbol} />
+					{#if i > 0}&nbsp;+&nbsp;{/if}<ParticleSymbol symbol={getParticle(id).symbol} />
 				{/each}
 			</dd>
 			<dt>Held by</dt>
