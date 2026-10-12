@@ -3,7 +3,8 @@
 An interactive guide to the Standard Model of particle physics, built with SvelteKit and deployed
 to GitHub Pages.
 
-- **Particles** — the 17 elementary particles, with mass, charge, spin and the forces each feels.
+- **Particles** — the 17 elementary particles as collectible cards: a glowing 3D orb, stats drawn
+  from real physics (stability, mass, charge…), types, interaction partners, moves and evolutions.
 - **Particle Lab** — combine quarks into hadrons, hadrons into nuclei and nuclei with electrons into
   atoms; split them apart; run decays and see which quantities are conserved.
 - **Interactions** — the strong, electromagnetic and weak forces and the Higgs field, which

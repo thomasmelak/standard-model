@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ParticleDetails from '#lib/components/ParticleDetails.svelte';
+	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
 	import { resolve } from '$app/paths';
 	import { getParticle, standardModelTable } from '#lib/physics/index.ts';
@@ -52,7 +52,7 @@
 		</ul>
 	</div>
 
-	<ParticleDetails particle={selected} />
+	<ParticleCard particle={selected} onselect={(id) => (selectedId = id)} />
 </div>
 
 <style>

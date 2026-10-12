@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Orb from './Orb.svelte';
 	import ParticleSymbol from './ParticleSymbol.svelte';
 	import { formatFraction, formatMass, type Particle } from '#lib/physics/index.ts';
 
@@ -24,7 +25,10 @@
 	{onclick}
 >
 	<span class="charge">{formatFraction(particle.charge3, 3)}</span>
-	<span class="symbol"><ParticleSymbol symbol={label ?? particle.symbol} /></span>
+	<span class="art">
+		<Orb {particle} size={compact ? 34 : 50} />
+		<span class="symbol"><ParticleSymbol symbol={label ?? particle.symbol} /></span>
+	</span>
 	{#if !compact}
 		<span class="name">{particle.name}</span>
 		<span class="mass">{formatMass(particle.massMeV)}</span>
@@ -74,13 +78,37 @@
 		color: var(--muted);
 	}
 
+	/* The symbol sits on the orb, like a label on a glowing marble. */
+	.art {
+		display: grid;
+		place-items: center;
+		width: 56px;
+		height: 56px;
+		margin-bottom: 0.15rem;
+	}
+
+	.compact .art {
+		width: 36px;
+		height: 36px;
+		margin: 0;
+	}
+
+	.art > :global(*) {
+		grid-area: 1 / 1;
+	}
+
 	.symbol {
-		font-size: 1.6rem;
-		font-weight: 600;
+		position: relative;
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: white;
+		text-shadow:
+			0 0 4px rgb(0 0 0 / 0.8),
+			0 1px 2px rgb(0 0 0 / 0.9);
 	}
 
 	.compact .symbol {
-		font-size: 1.1rem;
+		font-size: 0.9rem;
 	}
 
 	.name {
