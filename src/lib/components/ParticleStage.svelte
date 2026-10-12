@@ -12,14 +12,16 @@
 		size: number;
 		mode: ViewMode;
 		onselect?: (id: string) => void;
+		/** Lets the orb be dragged around (full-screen view). */
+		rotatable?: boolean;
 	}
 
-	let { particle, size, mode, onselect }: Props = $props();
+	let { particle, size, mode, onselect, rotatable = false }: Props = $props();
 </script>
 
 <div class="stage" style:--size={`${size}px`}>
 	<span class="orb" class:dim={mode !== 'orb' && !particle.elementary}>
-		<OrbCanvas {particle} {size} />
+		<OrbCanvas {particle} {size} rotatable={rotatable && mode === 'orb'} />
 	</span>
 	{#if mode !== 'orb' && !particle.elementary}
 		<span class="overlay">

@@ -6,6 +6,8 @@ export interface OrbFrame extends OrbParams {
 	time: number;
 	/** 1 draws the glass highlights; 0 leaves them out (for snapshots that get rotated). */
 	highlight: number;
+	/** Camera yaw and pitch in radians, for dragging the orb around. Defaults to [0, 0]. */
+	view?: [number, number];
 }
 
 export interface OrbRenderer {
@@ -52,7 +54,8 @@ export function createOrbRenderer(gl: WebGLRenderingContext): OrbRenderer {
 		turbulence: at('turbulence'),
 		anti: at('anti'),
 		seed: at('seed'),
-		highlight: at('highlight')
+		highlight: at('highlight'),
+		view: at('view')
 	};
 
 	return {
@@ -68,6 +71,7 @@ export function createOrbRenderer(gl: WebGLRenderingContext): OrbRenderer {
 			gl.uniform1f(u.anti, f.anti);
 			gl.uniform1f(u.seed, f.seed);
 			gl.uniform1f(u.highlight, f.highlight);
+			gl.uniform2f(u.view, ...(f.view ?? [0, 0]));
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		},
 		dispose() {

@@ -138,7 +138,7 @@
 						onclick={() => step(prev)}>‹</button
 					>
 				{/if}
-				<ParticleStage {particle} size={stageSize} {mode} {onselect} />
+				<ParticleStage {particle} size={stageSize} {mode} {onselect} rotatable />
 				{#if canStep}
 					<button
 						type="button"
@@ -169,7 +169,9 @@
 					<StatBars {particle} />
 				</section>
 				{#if canStep}
-					<p class="hint">Swipe or ← → to browse · {index + 1} of {sequence.length} discovered</p>
+					<p class="hint">
+						Drag the orb to rotate · Swipe or ← → to browse · {index + 1} of {sequence.length} discovered
+					</p>
 				{/if}
 			</aside>
 		</div>
