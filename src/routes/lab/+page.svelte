@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Equation from '#lib/components/Equation.svelte';
 	import { draggable } from '#lib/dnd.ts';
+	import { game } from '#lib/game/store.svelte.ts';
 	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
 	import {
@@ -67,8 +68,10 @@
 		}))
 	);
 
-	function setBench(ids: string[]) {
+	/** Replaces the bench; anything new that appears on it joins the collection. */
+	function setBench(ids: string[], reactionId?: string) {
 		bench = ids.map((id) => ({ key: nextKey++, id }));
+		game.discover(ids, reactionId);
 	}
 
 	function record(entry: Omit<LogEntry, 'key'>) {
@@ -151,7 +154,7 @@
 			checks,
 			ok: checks.every((c) => c.conserved)
 		});
-		setBench(reaction.outputs);
+		setBench(reaction.outputs, reaction.id);
 	}
 </script>
 
@@ -172,9 +175,13 @@
 			<h3>{headings[group.category]}</h3>
 			<div class="grid">
 				{#each group.particles as p (p.id)}
-					<span class="drag" use:draggable={{ ondrop: (zone) => zone === 'bench' && add(p.id) }}>
-						<ParticleTile particle={p} compact onclick={() => add(p.id)} />
-					</span>
+					{#if game.isDiscovered(p.id)}
+						<span class="drag" use:draggable={{ ondrop: (zone) => zone === 'bench' && add(p.id) }}>
+							<ParticleTile particle={p} compact onclick={() => add(p.id)} />
+						</span>
+					{:else}
+						<ParticleTile particle={p} compact locked />
+					{/if}
 				{/each}
 			</div>
 		{/each}

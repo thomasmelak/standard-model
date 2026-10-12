@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Orb from './Orb.svelte';
 	import ParticleSymbol from './ParticleSymbol.svelte';
+	import { hint } from '#lib/game/collection.ts';
 	import { formatFraction, formatMass, type Particle } from '#lib/physics/index.ts';
 
 	interface Props {
@@ -10,9 +11,18 @@
 		/** Overrides the symbol shown, e.g. "W±" for the combined W tile. */
 		label?: string;
 		onclick?: () => void;
+		/** Not discovered yet: shown as a silhouette with a hint, and can't be picked. */
+		locked?: boolean;
 	}
 
-	let { particle, selected = false, compact = false, label, onclick }: Props = $props();
+	let {
+		particle,
+		selected = false,
+		compact = false,
+		label,
+		onclick,
+		locked = false
+	}: Props = $props();
 </script>
 
 <button
@@ -20,18 +30,28 @@
 	class="tile"
 	class:selected
 	class:compact
+	class:locked
 	style:--tile-color={`var(--${particle.category})`}
-	title={particle.name}
+	title={locked ? `Undiscovered. ${hint(particle)}` : particle.name}
+	aria-label={locked ? 'Undiscovered particle' : undefined}
+	disabled={locked}
 	{onclick}
 >
-	<span class="charge">{formatFraction(particle.charge3, 3)}</span>
-	<span class="art">
-		<Orb {particle} size={compact ? 34 : 50} />
-		<span class="symbol"><ParticleSymbol symbol={label ?? particle.symbol} /></span>
-	</span>
-	{#if !compact}
-		<span class="name">{particle.name}</span>
-		<span class="mass">{formatMass(particle.massMeV)}</span>
+	{#if locked}
+		<span class="art"><span class="silhouette">?</span></span>
+		{#if !compact}
+			<span class="name">???</span>
+		{/if}
+	{:else}
+		<span class="charge">{formatFraction(particle.charge3, 3)}</span>
+		<span class="art">
+			<Orb {particle} size={compact ? 34 : 50} />
+			<span class="symbol"><ParticleSymbol symbol={label ?? particle.symbol} /></span>
+		</span>
+		{#if !compact}
+			<span class="name">{particle.name}</span>
+			<span class="mass">{formatMass(particle.massMeV)}</span>
+		{/if}
 	{/if}
 </button>
 
@@ -56,6 +76,29 @@
 	.tile:hover {
 		transform: translateY(-2px);
 		border-color: var(--tile-color);
+	}
+
+	.tile.locked {
+		border-style: dashed;
+		border-color: var(--border);
+		background: var(--surface-2);
+		cursor: not-allowed;
+	}
+
+	.tile.locked:hover {
+		transform: none;
+	}
+
+	/* An undiscovered particle: a dark, featureless sphere. */
+	.silhouette {
+		display: grid;
+		place-items: center;
+		width: 70%;
+		height: 70%;
+		border-radius: 50%;
+		background: radial-gradient(circle at 40% 35%, #3a3f48, #12151a 75%);
+		color: rgb(255 255 255 / 0.5);
+		font-weight: 700;
 	}
 
 	.tile.selected {
