@@ -4,6 +4,8 @@ An interactive guide to the Standard Model of particle physics, built with Svelt
 to GitHub Pages.
 
 - **Particles** — the 17 elementary particles, with mass, charge, spin and the forces each feels.
+- **Particle Lab** — combine quarks into hadrons, hadrons into nuclei and nuclei with electrons into
+  atoms; split them apart; run decays and see which quantities are conserved.
 - **Interactions** — the strong, electromagnetic and weak forces and the Higgs field, which
   particles feel each one, and example processes.
 - Light and dark themes (follows your OS; toggle in the header).

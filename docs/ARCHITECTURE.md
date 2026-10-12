@@ -8,6 +8,7 @@ src/
 ├── app.css, app.html        Global styles, theme tokens, no-flash theme script
 ├── routes/                  Pages (all prerendered via +layout.ts)
 │   ├── +page.svelte         /              The Standard Model table
+│   ├── lab/                 /lab           The Particle Lab
 │   └── interactions/        /interactions  The four interactions and who feels them
 └── lib/
     ├── components/          Svelte UI: ParticleTile, ParticleDetails, ThemeToggle
@@ -16,7 +17,8 @@ src/
         ├── elementary.ts    The 17 elementary particles + generated antiparticles
         ├── composites.ts    Hadrons, nuclei and atoms, defined by their constituents
         ├── reactions.ts     Decays and annihilations
-        └── particles.ts     Registry, quantum-number sums, binding energy, formatting
+        ├── particles.ts     Registry, quantum-number sums, binding energy, formatting
+        └── lab.ts           Lab operations: combine, split, findReaction, checkConservation
 ```
 
 Dependencies point one way: **routes → components → physics**. The physics library knows nothing
@@ -37,6 +39,21 @@ reactions are added as data.
 
 Known simplifications: the π⁰ is modelled as uū (really a uū/dd̄ mixture), colour charge is not
 tracked per quark, and masses are rounded for display.
+
+## Particle Lab
+
+The lab keeps a workbench of particle ids and calls into `lab.ts`:
+
+| Action  | Function                     | Behaviour                                                         |
+| ------- | ---------------------------- | ----------------------------------------------------------------- |
+| Combine | `combine(ids)`               | Bound state made of exactly these parts, in any order (u+u+d → p) |
+| Split   | `split(id)` / `constituents` | Replaces a composite with its parts                               |
+| React   | `findReaction(ids)`          | Runs a known process whose inputs match the workbench             |
+| —       | `checkConservation(in, out)` | Charge, baryon number and each lepton family number, before/after |
+
+When nothing forms, the notebook explains why: a fractional baryon number means colour confinement
+forbids it; a force carrier on the bench is exchanged between particles, not built with. Every
+reaction in `reactions.ts` is unit-tested to conserve all quantum numbers.
 
 ## Themes
 
@@ -59,7 +76,5 @@ GitHub Pages must be enabled once under **Settings → Pages → Source: GitHub 
 
 ## Roadmap
 
-- **Particle Lab** (next PR): combine quarks into hadrons, hadrons into nuclei and nuclei with
-  electrons into atoms; split them; run reactions and check conservation of charge, baryon number
-  and lepton family numbers.
-- Later: Feynman-diagram animations for each reaction, more nuclei and atoms.
+- Feynman-diagram animations for each reaction.
+- Drag-and-drop on the workbench; more nuclei and atoms.

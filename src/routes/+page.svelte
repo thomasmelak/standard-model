@@ -19,8 +19,8 @@
 	<h1>The Standard Model of particle physics</h1>
 	<p class="muted">
 		Seventeen elementary particles explain almost everything we know about matter and three of the
-		four fundamental forces. Click a particle to learn about it, or see
-		<a href={resolve('/interactions')}>how the forces act on each one</a>.
+		four fundamental forces. Click a particle to learn about it, then head to the
+		<a href={resolve('/lab')}>Particle Lab</a> to build protons, nuclei and atoms out of them.
 	</p>
 </section>
 

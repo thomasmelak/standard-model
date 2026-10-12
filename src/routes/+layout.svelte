@@ -10,6 +10,7 @@
 
 	const links = [
 		{ href: resolve('/'), label: 'Particles' },
+		{ href: resolve('/lab'), label: 'Particle Lab' },
 		{ href: resolve('/interactions'), label: 'Interactions' }
 	];
 </script>

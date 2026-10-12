@@ -62,6 +62,8 @@
 	.tile.compact {
 		min-height: 3.5rem;
 		min-width: 3.5rem;
+		/* Keep the symbol clear of the charge label in the corner. */
+		padding-top: 1rem;
 	}
 
 	.charge {
@@ -78,7 +80,7 @@
 	}
 
 	.compact .symbol {
-		font-size: 1.2rem;
+		font-size: 1.1rem;
 	}
 
 	.name {
