@@ -11,14 +11,16 @@ src/
 │   ├── lab/                 /lab           The Particle Lab
 │   └── interactions/        /interactions  The four interactions and who feels them
 └── lib/
-    ├── components/          Svelte UI: ParticleTile, ParticleDetails, ThemeToggle
+    ├── components/          Svelte UI: ParticleCard, ParticleTile, Orb, OrbCanvas, ThemeToggle, …
     └── physics/             Framework-free TypeScript, unit-tested with Vitest
         ├── types.ts         Particle, Reaction, Force, quantum numbers
         ├── elementary.ts    The 17 elementary particles + generated antiparticles
         ├── composites.ts    Hadrons, nuclei and atoms, defined by their constituents
         ├── reactions.ts     Decays and annihilations
         ├── particles.ts     Registry, quantum-number sums, binding energy, formatting
-        └── lab.ts           Lab operations: combine, split, findReaction, checkConservation
+        ├── lab.ts           Lab operations: combine, split, findReaction, checkConservation
+        ├── lifetimes.ts     Mean lifetimes, for the HP stat
+        └── stats.ts         Card stats, types, interactions, moves and evolutions
 ```
 
 Dependencies point one way: **routes → components → physics**. The physics library knows nothing
@@ -54,6 +56,40 @@ The lab keeps a workbench of particle ids and calls into `lab.ts`:
 When nothing forms, the notebook explains why: a fractional baryon number means colour confinement
 forbids it; a force carrier on the bench is exchanged between particles, not built with. Every
 reaction in `reactions.ts` is unit-tested to conserve all quantum numbers.
+
+## Particle cards
+
+Every particle has a collectible-style card (`ParticleCard.svelte`). Each number on it comes from
+real physics in `stats.ts`, scaled to 0–100:
+
+| Stat   | Physics behind it                                       | Scale                                      |
+| ------ | ------------------------------------------------------- | ------------------------------------------ |
+| HP     | Mean lifetime (stability)                               | Stable = 100; log₁₀(τ/s) from −25 to +5    |
+| Power  | Rest mass                                               | log₁₀(m/MeV) from −1 to 5.3                |
+| Speed  | Inverse of mass; massless particles move at light speed | 100 for massless, else 100 − Power (min 5) |
+| Charge | Absolute electric charge                                | 50 per unit of e                           |
+| Reach  | Interactions it takes part in (felt or carried)         | 25 per interaction                         |
+
+- **Types** are the interactions a particle takes part in. Composites take the types of their
+  quarks and leptons.
+- **Interacts with** lists, force by force, the Standard Model particles on the other side: a
+  particle that feels a force couples to its carrier and to everything else that feels it; a
+  carrier acts on everything that feels its force.
+- **Moves** are the reactions the particle can start; **Evolution** shows what it is made from and
+  which composites it fuses into.
+- Quarks are never free, so heavy quarks use the lifetime of the lightest hadron carrying them.
+
+### Orbs
+
+Each particle is drawn as a glowing orb coloured by its category. Heavier particles are larger,
+unstable ones pulse faster, antiparticles have a dark core and bright rim, and composites have
+their constituents orbiting them.
+
+- `OrbCanvas.svelte` renders the card's orb in WebGL: one fragment shader ray-casts a lit sphere
+  with an animated noise "plasma" surface, rim light and halo. It falls back to the CSS orb without
+  WebGL, and draws a still frame under `prefers-reduced-motion`.
+- `Orb.svelte` is a CSS-only orb (layered gradients and animations) for tiles and chips, where
+  dozens appear at once and a WebGL context each would exceed browser limits.
 
 ## Themes
 

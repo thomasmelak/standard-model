@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Equation from '#lib/components/Equation.svelte';
-	import ParticleDetails from '#lib/components/ParticleDetails.svelte';
+	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
 	import {
 		allParticles,
@@ -221,7 +221,7 @@
 		</section>
 
 		{#if inspectedId}
-			<ParticleDetails particle={getParticle(inspectedId)} />
+			<ParticleCard particle={getParticle(inspectedId)} onselect={(id) => (inspectedId = id)} />
 		{/if}
 
 		{#if log.length}
