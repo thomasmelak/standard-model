@@ -1,40 +1,64 @@
 <script lang="ts">
-	import { getParticle, particleStats, type Particle } from '#lib/physics/index.ts';
+	import { orbParams, parseRgb } from '#lib/orb/params.ts';
+	import { orbSnapshot } from '#lib/orb/snapshots.ts';
+	import { themeVersion } from '#lib/orb/theme.svelte.ts';
+	import { getParticle, type Particle } from '#lib/physics/index.ts';
+
+	// A small orb for tiles and chips: a still frame of the card's shader that
+	// slowly turns, under a static glass highlight. Before hydration, or without
+	// WebGL, a CSS approximation stands in.
 
 	interface Props {
 		particle: Particle;
-		/** Diameter in pixels of the largest orb; lighter particles render smaller. */
+		/** Diameter in pixels of the heaviest orb; lighter particles render smaller. */
 		size?: number;
 	}
 
 	let { particle, size = 64 }: Props = $props();
 
-	const stats = $derived(particleStats(particle));
-	const hp = $derived(stats.find((s) => s.key === 'hp')!.value);
-	const power = $derived(stats.find((s) => s.key === 'power')!.value);
-
-	// Heavier particles are bigger; massless ones still get a visible core.
-	const diameter = $derived(Math.round(size * (0.62 + (power / 100) * 0.38)));
-	// Unstable particles pulse faster.
-	const pulse = $derived(`${(0.8 + (hp / 100) * 3.2).toFixed(2)}s`);
-	const anti = $derived(
-		particle.baryon3 < 0 || particle.leptonE + particle.leptonMu + particle.leptonTau < 0
-	);
+	const params = $derived(orbParams(particle));
+	// The shader draws spheres of radius 0.42–0.62; keep the same proportions here.
+	const diameter = $derived(Math.round((size * params.radius) / 0.62));
+	// Stable particles drift; short-lived ones churn.
+	const spin = $derived(`${(40 - 34 * params.turbulence).toFixed(1)}s`);
 	const moons = $derived(
 		particle.elementary ? [] : particle.constituents.map((id) => getParticle(id).category)
 	);
+
+	let root = $state<HTMLSpanElement>();
+	let fog = $state<HTMLCanvasElement>();
+	let ready = $state(false);
+
+	$effect(() => {
+		void themeVersion();
+		if (!root || !fog) return;
+		// The snapshot covers the shader's whole −1..1 canvas, halo included.
+		const px = Math.ceil((size / 0.62) * Math.min(devicePixelRatio, 2));
+		const snapshot = orbSnapshot(params, parseRgb(getComputedStyle(root).color), px);
+		if (!snapshot) return;
+		fog.width = px;
+		fog.height = px;
+		const ctx = fog.getContext('2d');
+		ctx?.clearRect(0, 0, px, px);
+		ctx?.drawImage(snapshot, 0, 0);
+		ready = true;
+	});
 </script>
 
 <span
+	bind:this={root}
 	class="orb"
-	class:anti
-	style:--c={`var(--${particle.category})`}
+	class:ready
+	class:anti={params.anti}
+	style:color={`var(--${particle.category})`}
 	style:--d={`${diameter}px`}
-	style:--pulse={pulse}
+	style:--frame={`${size / 0.62}px`}
+	style:--spin={spin}
 	aria-hidden="true"
 >
-	<span class="plasma"></span>
-	<span class="shine"></span>
+	<canvas bind:this={fog} class="fog"></canvas>
+	<span class="fallback"></span>
+	<span class="glass"></span>
 	{#each moons as category, i (i)}
 		<span
 			class="moon"
@@ -53,58 +77,71 @@
 		width: var(--d);
 		height: var(--d);
 		border-radius: 50%;
-		/* Lit from the upper left: highlight, body colour, then a dark limb. */
-		background: radial-gradient(
-			circle at 34% 30%,
-			color-mix(in srgb, var(--c) 25%, white) 0%,
-			var(--c) 38%,
-			color-mix(in srgb, var(--c) 45%, black) 78%,
-			color-mix(in srgb, var(--c) 20%, black) 100%
-		);
-		box-shadow:
-			0 0 calc(var(--d) * 0.35) color-mix(in srgb, var(--c) 70%, transparent),
-			inset calc(var(--d) * -0.08) calc(var(--d) * -0.1) calc(var(--d) * 0.2) rgb(0 0 0 / 0.35);
-		animation: glow var(--pulse) ease-in-out infinite alternate;
 	}
 
-	/* Antimatter: a dark core with a bright rim, the inverse of a normal orb. */
-	.orb.anti {
-		background: radial-gradient(
-			circle at 50% 50%,
-			color-mix(in srgb, var(--c) 15%, black) 0%,
-			color-mix(in srgb, var(--c) 35%, black) 48%,
-			var(--c) 80%,
-			color-mix(in srgb, var(--c) 30%, white) 100%
-		);
+	/* The shader frame is wider than the sphere (it holds the halo), so it
+	   overflows the orb box, centred, and turns about the centre. */
+	.fog {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: var(--frame);
+		height: var(--frame);
+		pointer-events: none;
+		opacity: 0;
+		transform: translate(-50%, -50%);
+		animation: turn var(--spin) linear infinite;
+		transition: opacity 0.3s;
 	}
 
-	/* A slowly turning swirl that reads as the orb's surface rotating. */
-	.plasma {
+	.ready .fog {
+		opacity: 1;
+	}
+
+	/* Stand-in until the shader snapshot is ready: a soft, translucent glow. */
+	.fallback {
 		position: absolute;
 		inset: 0;
 		border-radius: 50%;
-		background: conic-gradient(
-			from 0deg,
-			transparent 0deg,
-			color-mix(in srgb, var(--c) 40%, white) 60deg,
-			transparent 130deg,
-			color-mix(in srgb, var(--c) 30%, white) 220deg,
-			transparent 300deg
+		background: radial-gradient(
+			circle at 50% 50%,
+			color-mix(in srgb, currentColor 35%, white) 0%,
+			color-mix(in srgb, currentColor 55%, transparent) 28%,
+			color-mix(in srgb, currentColor 18%, transparent) 62%,
+			color-mix(in srgb, currentColor 55%, transparent) 94%,
+			transparent 100%
 		);
-		mix-blend-mode: soft-light;
-		opacity: 0.6;
-		animation: spin 9s linear infinite;
+		box-shadow: 0 0 calc(var(--d) * 0.35) color-mix(in srgb, currentColor 55%, transparent);
+		transition: opacity 0.3s;
 	}
 
-	.shine {
+	.anti .fallback {
+		background: radial-gradient(
+			circle at 50% 50%,
+			color-mix(in srgb, currentColor 10%, transparent) 0%,
+			color-mix(in srgb, currentColor 15%, transparent) 50%,
+			color-mix(in srgb, currentColor 75%, white) 92%,
+			transparent 100%
+		);
+	}
+
+	.ready .fallback {
+		opacity: 0;
+	}
+
+	/* A fixed glass glint and rim, so the light source stays put while the fog turns. */
+	.glass {
 		position: absolute;
-		top: 12%;
-		left: 18%;
-		width: 34%;
-		height: 24%;
+		inset: 0;
 		border-radius: 50%;
-		background: radial-gradient(ellipse, rgb(255 255 255 / 0.75), transparent 70%);
-		transform: rotate(-30deg);
+		background:
+			radial-gradient(
+				ellipse 38% 26% at 34% 24%,
+				rgb(255 255 255 / 0.55),
+				rgb(255 255 255 / 0.12) 55%,
+				transparent 72%
+			),
+			radial-gradient(circle at 50% 50%, transparent 86%, rgb(255 255 255 / 0.18) 97%, transparent);
 	}
 
 	/* Constituents of a composite orbit its surface. */
@@ -122,17 +159,9 @@
 		transform: rotate(var(--turn)) translateX(calc(var(--d) * 0.5)) rotate(calc(-1 * var(--turn)));
 	}
 
-	@keyframes glow {
+	@keyframes turn {
 		to {
-			box-shadow:
-				0 0 calc(var(--d) * 0.55) color-mix(in srgb, var(--c) 85%, transparent),
-				inset calc(var(--d) * -0.08) calc(var(--d) * -0.1) calc(var(--d) * 0.2) rgb(0 0 0 / 0.35);
-		}
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
+			transform: translate(-50%, -50%) rotate(360deg);
 		}
 	}
 
@@ -147,8 +176,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.orb,
-		.plasma,
+		.fog,
 		.moon {
 			animation: none;
 		}
