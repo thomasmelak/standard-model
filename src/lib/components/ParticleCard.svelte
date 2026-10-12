@@ -4,6 +4,7 @@
 	import ParticleStage from './ParticleStage.svelte';
 	import ParticleSymbol from './ParticleSymbol.svelte';
 	import ParticleViewer from './ParticleViewer.svelte';
+	import StatBars from './StatBars.svelte';
 	import TypeBadge from './TypeBadge.svelte';
 	import { hint } from '#lib/game/collection.ts';
 	import { game } from '#lib/game/store.svelte.ts';
@@ -18,7 +19,6 @@
 		particleEvolution,
 		particleInteractions,
 		particleMoves,
-		particleStats,
 		particleTypes,
 		type Force,
 		type Particle
@@ -33,8 +33,6 @@
 	let { particle, onselect }: Props = $props();
 
 	const types = $derived(particleTypes(particle));
-	const stats = $derived(particleStats(particle));
-	const total = $derived(stats.reduce((sum, s) => sum + s.value, 0));
 	const interactions = $derived(particleInteractions(particle));
 	const moves = $derived(particleMoves(particle));
 	const evolution = $derived(particleEvolution(particle));
@@ -99,18 +97,7 @@
 
 	<section>
 		<h3>Stats</h3>
-		<dl class="stats">
-			{#each stats as s (s.key)}
-				<dt title={s.meaning}>{s.label}</dt>
-				<dd title={s.meaning}>
-					<span class="bar"><span style:width={`${s.value}%`}></span></span>
-					<span class="value">{s.value}</span>
-					<span class="meaning">{s.meaning}</span>
-				</dd>
-			{/each}
-			<dt>Total</dt>
-			<dd><strong>{total}</strong></dd>
-		</dl>
+		<StatBars {particle} />
 	</section>
 
 	<section>
@@ -313,55 +300,6 @@
 	section {
 		border-top: 1px solid var(--border);
 		padding-top: 0.6rem;
-	}
-
-	.stats {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 0.25rem 0.75rem;
-		margin: 0;
-		align-items: center;
-	}
-
-	.stats dt {
-		align-self: start;
-		font-weight: 600;
-		font-size: 0.85rem;
-		line-height: 1;
-	}
-
-	.stats dd {
-		display: grid;
-		grid-template-columns: 1fr 2.2rem;
-		align-items: center;
-		gap: 0 0.5rem;
-		margin: 0;
-	}
-
-	.bar {
-		height: 0.55rem;
-		border-radius: 999px;
-		background: var(--surface-2);
-		overflow: hidden;
-	}
-
-	.bar span {
-		display: block;
-		height: 100%;
-		border-radius: inherit;
-		background: linear-gradient(90deg, color-mix(in srgb, var(--c) 60%, white), var(--c));
-	}
-
-	.value {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
-		font-size: 0.85rem;
-	}
-
-	.meaning {
-		grid-column: 1 / -1;
-		font-size: 0.72rem;
-		color: var(--muted);
 	}
 
 	.interaction,
