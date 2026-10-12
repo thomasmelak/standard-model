@@ -53,6 +53,10 @@ The lab keeps a workbench of particle ids and calls into `lab.ts`:
 | React   | `findReaction(ids)`          | Runs a known process whose inputs match the workbench             |
 | —       | `checkConservation(in, out)` | Charge, baryon number and each lepton family number, before/after |
 
+Particles move by drag and drop (`src/lib/dnd.ts`, a pointer-events `draggable` action, so mouse,
+pen and touch all work): drag from the palette onto the workbench to add, drag a bench particle off
+to remove it. Clicking still works. Drop zones are elements with a `data-drop` attribute.
+
 When nothing forms, the notebook explains why: a fractional baryon number means colour confinement
 forbids it; a force carrier on the bench is exchanged between particles, not built with. Every
 reaction in `reactions.ts` is unit-tested to conserve all quantum numbers.
@@ -78,6 +82,15 @@ real physics in `stats.ts`, scaled to 0–100:
 - **Moves** are the reactions the particle can start; **Evolution** shows what it is made from and
   which composites it fuses into.
 - Quarks are never free, so heavy quarks use the lifetime of the lightest hadron carrying them.
+
+### Full screen and constituents
+
+- The ⤢ button on a card opens `ParticleViewer.svelte`: a modal `<dialog>` with a large live orb,
+  which also requests browser full screen where allowed. Esc or ✕ closes it.
+- Composite particles get a view toggle (`ViewModeToggle.svelte`): **Orb**, **Parts** (direct
+  constituents, e.g. ⁴He atom → ⁴He²⁺ + e⁻ + e⁻) and, when different, **Quarks & leptons** (every
+  elementary constituent, e.g. 6 u + 6 d + 2 e⁻). `Constituents.svelte` lays the parts on a ring over
+  the dimmed orb; each part is clickable and opens its own card.
 
 ### Orbs
 

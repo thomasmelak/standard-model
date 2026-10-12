@@ -36,6 +36,11 @@ describe('stats', () => {
 		}
 	});
 
+	it('describes fractional charge as a fraction', () => {
+		const charge = particleStats(getParticle('u')).find((s) => s.key === 'charge')!;
+		expect(charge.meaning).toBe('Electric charge: 2/3 e (absolute)');
+	});
+
 	it('shares stats between a particle and its antiparticle', () => {
 		expect(particleStats(getParticle('mu+'))).toEqual(particleStats(getParticle('mu-')));
 	});

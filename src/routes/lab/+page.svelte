@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Equation from '#lib/components/Equation.svelte';
+	import { draggable } from '#lib/dnd.ts';
 	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
 	import {
@@ -156,13 +157,13 @@
 
 <h1>Particle Lab</h1>
 <p class="muted">
-	Click particles to place them on the workbench. Combine quarks into hadrons, hadrons into nuclei
-	and nuclei with electrons into atoms — or split them back apart and run decays to watch the
-	conservation laws at work.
+	Drag particles onto the workbench (or click them), and drag them off again to remove them. Combine
+	quarks into hadrons, hadrons into nuclei and nuclei with electrons into atoms — or split them back
+	apart and run decays to watch the conservation laws at work.
 </p>
 
 <div class="layout">
-	<section class="panel palette">
+	<section class="panel palette" data-drop="palette">
 		<header>
 			<h2>Particles</h2>
 			<label><input type="checkbox" bind:checked={showAntiparticles} /> Antiparticles</label>
@@ -171,7 +172,9 @@
 			<h3>{headings[group.category]}</h3>
 			<div class="grid">
 				{#each group.particles as p (p.id)}
-					<ParticleTile particle={p} compact onclick={() => add(p.id)} />
+					<span class="drag" use:draggable={{ ondrop: (zone) => zone === 'bench' && add(p.id) }}>
+						<ParticleTile particle={p} compact onclick={() => add(p.id)} />
+					</span>
 				{/each}
 			</div>
 		{/each}
@@ -180,9 +183,12 @@
 	<div class="right">
 		<section class="panel">
 			<h2>Workbench</h2>
-			<div class="bench" aria-live="polite">
+			<div class="bench" data-drop="bench" aria-live="polite">
 				{#each bench as item (item.key)}
-					<div class="bench-item">
+					<div
+						class="bench-item"
+						use:draggable={{ ondrop: (zone) => zone !== 'bench' && remove(item.key) }}
+					>
 						<ParticleTile
 							particle={getParticle(item.id)}
 							selected={inspectedId === item.id}
@@ -196,7 +202,9 @@
 						>
 					</div>
 				{:else}
-					<p class="muted">Empty — pick some particles. Try two up quarks and a down quark.</p>
+					<p class="muted">
+						Empty — drag particles here, or click them. Try two up quarks and a down quark.
+					</p>
 				{/each}
 			</div>
 
@@ -300,6 +308,35 @@
 		grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
 		gap: 0.5rem;
 		min-height: 7rem;
+		padding: 0.5rem;
+		border: 2px dashed transparent;
+		border-radius: 10px;
+		transition:
+			border-color 0.15s,
+			background 0.15s;
+	}
+
+	/* While dragging, show where particles can be dropped. */
+	:global(body.is-dragging) .bench {
+		border-color: var(--border);
+	}
+
+	.bench:global(.drop-over) {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 8%, transparent);
+	}
+
+	.drag {
+		display: block;
+		cursor: grab;
+	}
+
+	.bench-item {
+		cursor: grab;
+	}
+
+	:global(.dragging) {
+		opacity: 0.4;
 	}
 
 	.bench-item {

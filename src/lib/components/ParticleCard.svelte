@@ -1,8 +1,11 @@
 <script lang="ts">
 	import Equation from './Equation.svelte';
 	import Orb from './Orb.svelte';
-	import OrbCanvas from './OrbCanvas.svelte';
+	import ParticleStage from './ParticleStage.svelte';
 	import ParticleSymbol from './ParticleSymbol.svelte';
+	import ParticleViewer from './ParticleViewer.svelte';
+	import TypeBadge from './TypeBadge.svelte';
+	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
 	import {
 		bindingEnergyMeV,
 		dexNumber,
@@ -35,12 +38,8 @@
 	const evolution = $derived(particleEvolution(particle));
 	const leptonNumber = $derived(particle.leptonE + particle.leptonMu + particle.leptonTau);
 
-	const forceNames: Record<Force, string> = {
-		strong: 'Strong',
-		electromagnetic: 'Electric',
-		weak: 'Weak',
-		higgs: 'Higgs'
-	};
+	let mode = $state<ViewMode>('orb');
+	let fullscreen = $state(false);
 </script>
 
 {#snippet chip(id: string)}
@@ -52,7 +51,7 @@
 {/snippet}
 
 {#snippet badge(force: Force)}
-	<span class="badge" style:--f={`var(--${force})`}>{forceNames[force]}</span>
+	<TypeBadge {force} />
 {/snippet}
 
 <article class="card" style:--c={`var(--${particle.category})`}>
@@ -69,9 +68,21 @@
 	</header>
 
 	<div class="art" style:--glow={`var(--${particle.category})`}>
-		<OrbCanvas {particle} size={190} />
+		<ParticleStage {particle} size={190} {mode} {onselect} />
 		<span class="art-symbol"><ParticleSymbol symbol={particle.symbol} /></span>
+		<span class="art-tools">
+			<ViewModeToggle {particle} bind:mode />
+			<button
+				type="button"
+				class="expand"
+				title="Full screen"
+				aria-label="Show {particle.name} full screen"
+				onclick={() => (fullscreen = true)}>⤢</button
+			>
+		</span>
 	</div>
+
+	<ParticleViewer {particle} bind:open={fullscreen} bind:mode {onselect} />
 
 	<p class="tagline">
 		<span class="kind">{particle.category.replace('-', ' ')}</span>
@@ -233,19 +244,6 @@
 		gap: 0.3rem;
 	}
 
-	.badge {
-		padding: 0.05rem 0.55rem;
-		border-radius: 999px;
-		background: var(--f);
-		/* Force colours are dark in the light theme and light in the dark theme. */
-		color: var(--bg);
-		font-size: 0.72rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		white-space: nowrap;
-	}
-
 	/* The art window stays dark in both themes so the orb's glow reads. */
 	.art {
 		position: relative;
@@ -258,6 +256,33 @@
 			#05070b 75%
 		);
 		border: 1px solid color-mix(in srgb, var(--glow) 40%, transparent);
+	}
+
+	.art-tools {
+		position: absolute;
+		top: 0.5rem;
+		left: 0.5rem;
+		right: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.expand {
+		margin-left: auto;
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid rgb(255 255 255 / 0.2);
+		border-radius: 8px;
+		background: rgb(0 0 0 / 0.45);
+		color: white;
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.expand:hover,
+	.expand:focus-visible {
+		border-color: rgb(255 255 255 / 0.6);
 	}
 
 	.art-symbol {
