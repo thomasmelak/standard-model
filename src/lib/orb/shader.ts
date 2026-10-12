@@ -1,7 +1,7 @@
 // The orb's fragment shader: a translucent glass sphere filled with raymarched,
 // swirling fog and energy filaments around a bright core. GLSL ES 1.00 (WebGL 1),
 // premultiplied-alpha output.
-// Uniforms: time, color, radius, turbulence, anti, seed, highlight (see params.ts).
+// Uniforms: time, color, radius, turbulence, anti, seed, highlight, view (see params.ts and renderer.ts).
 
 export const ORB_VERTEX = `
 	attribute vec2 position;
@@ -33,6 +33,7 @@ uniform float turbulence;
 uniform float anti;
 uniform float seed;
 uniform float highlight;
+uniform vec2 view; // camera yaw, pitch (radians): orbits the view around the orb's contents
 
 #define FOG_STEPS 24
 #define SHELLS 5
@@ -120,6 +121,8 @@ void main() {
 	float twist = (2.6 + 1.8 * turb) * sgn;
 	mat2 tiltA = rot(0.45 + seed * 2.3);
 	mat2 tiltB = rot(-0.3 + seed * 3.7);
+	mat2 camYaw = rot(view.x);
+	mat2 camPitch = rot(view.y);
 	vec3 so = vec3(seed * 7.0, seed * 5.0, seed * 3.0); // small: keeps hash inputs low under mediump
 	// counter-rotating frames: the fog evolves without winding up
 	mat2 evo1 = rot(wa(-(0.13 + 0.5 * turb) * sgn));
@@ -141,6 +144,8 @@ void main() {
 	for (int i = 0; i < FOG_STEPS; i++) {
 		vec3 p = pos;
 		float r = length(p);
+		p.yz = camPitch * p.yz;
+		p.xz = camYaw * p.xz;
 		p.yz = tiltA * p.yz;
 		p.xy = tiltB * p.xy;
 		float om = 1.0 - r;
@@ -207,6 +212,8 @@ void main() {
 			for (int j = 0; j < 2; j++) {
 				float t = -bpar + (j == 0 ? -sq : sq);
 				vec3 s = n + rd * t;
+				s.yz = camPitch * s.yz;
+				s.xz = camYaw * s.xz;
 				s.yz = tiltA * s.yz;
 				s.xy = tiltB * s.xy;
 				float om = 1.0 - rk;
