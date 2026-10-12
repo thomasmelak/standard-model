@@ -22,19 +22,28 @@ both themes: the full-screen viewer and a card's art window.
 
 ## Components (`src/lib/ui`)
 
-| Component          | Use it for                              | Props                                                                                        |
-| ------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `GlassCard`        | Every panel, card and list item surface | `as` (element), `glow` (colour), `shine` (animated rim + sheen), `ghost` (locked), `padding` |
-| `Button`           | Every button                            | `variant` primary / secondary / ghost, `size` sm / md / lg, `icon` (round, one glyph)        |
-| `Chip`             | Small pills, usually orb + symbol       | `onclick` (makes it a button), `locked`, `title`                                             |
-| `Badge`            | Solid uppercase labels                  | `color`                                                                                      |
-| `SectionLabel`     | Small uppercase headings inside a card  | `as` (h2–h4)                                                                                 |
-| `SegmentedControl` | Mutually exclusive options in one pill  | `options`, `bind:value`, `label`                                                             |
-| `ProgressBar`      | Stat bars, dex progress                 | `value`, `max`, `fill` (colour or gradient), `height`, `label`                               |
+| Component          | Use it for                                                    | Props                                                                                        |
+| ------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GlassCard`        | Every panel, card and list item surface                       | `as` (element), `glow` (colour), `shine` (animated rim + sheen), `ghost` (locked), `padding` |
+| `Button`           | Every button                                                  | `variant` primary / secondary / ghost, `size` sm / md / lg, `icon` (round, one glyph)        |
+| `Chip`             | Small pills, usually orb + symbol                             | `onclick` (makes it a button), `locked`, `title`                                             |
+| `Badge`            | Solid uppercase labels                                        | `color`                                                                                      |
+| `SectionLabel`     | Small uppercase headings inside a card                        | `as` (h2–h4)                                                                                 |
+| `SegmentedControl` | Mutually exclusive options in one pill                        | `options`, `bind:value`, `label`                                                             |
+| `ProgressBar`      | Stat bars, dex progress                                       | `value`, `max`, `fill` (colour or gradient), `height`, `label`                               |
+| `VerticalTabs`     | An icon rail switching a panel's content                      | `tabs` ({ id, label, icon }), `bind:value`, `label`, a `children(tab)` snippet; ↑/↓ keys     |
+| `Icon`             | Line icons: atom, flask, interact, cards, stats, evolve, bolt | `name`, `size`, `label` (omit when decorative)                                               |
 
-Domain components build on these: `TypeBadge` is a `Badge` per force, `StatBars` is a list of
+Domain components build on these: `ParticleChip` (orb + symbol, or a locked "?"), `InteractionList` and `EvolutionList` are shared by the card and the full-screen view; `TypeBadge` is a `Badge` per force, `StatBars` is a list of
 `ProgressBar`s, `ViewModeToggle` is a `SegmentedControl`, `ParticleCard` is a shining `GlassCard`,
 and particle tiles use the same glass recipe tinted with the particle's colour.
+
+## Navigation
+
+- **Desktop and landscape:** text links in the glass header.
+- **Portrait up to 900px:** the header keeps the brand and theme toggle, and the links move to a
+  frosted **bottom tab bar** of icons (Particles, Lab, Forces, and Dex with a discovered count). It
+  sets `--tabbar-h`, which the body's bottom padding and the unlock pop-up use to stay clear of it.
 
 ## Rules
 
