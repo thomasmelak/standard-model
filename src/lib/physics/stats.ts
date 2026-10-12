@@ -1,6 +1,6 @@
 import { standardModelTable } from './elementary';
 import { lifetimeSeconds } from './lifetimes';
-import { allParticles, compositeParticles, getParticle } from './particles';
+import { allParticles, compositeParticles, formatFraction, getParticle } from './particles';
 import { reactions } from './reactions';
 import type { CompositeParticle, ElementaryParticle, Force, Particle, Reaction } from './types';
 
@@ -76,7 +76,7 @@ export function particleStats(particle: Particle): Stat[] {
 			key: 'charge',
 			label: 'Charge',
 			value: charge,
-			meaning: `Electric charge: ${Math.abs(particle.charge3) / 3} e (absolute)`
+			meaning: `Electric charge: ${formatFraction(Math.abs(particle.charge3), 3).replace('+', '')} e (absolute)`
 		},
 		{
 			key: 'reach',
