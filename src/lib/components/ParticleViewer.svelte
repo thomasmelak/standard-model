@@ -5,7 +5,9 @@
 	import TypeBadge from './TypeBadge.svelte';
 	import { game } from '#lib/game/store.svelte.ts';
 	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
-	import { Button, GlassCard, SectionLabel } from '#lib/ui/index.ts';
+	import EvolutionList from './EvolutionList.svelte';
+	import InteractionList from './InteractionList.svelte';
+	import { Button, GlassCard, SectionLabel, VerticalTabs, type IconName } from '#lib/ui/index.ts';
 	import {
 		dexNumber,
 		formatFraction,
@@ -29,6 +31,14 @@
 	let { particle, open = $bindable(), mode = $bindable(), onselect }: Props = $props();
 
 	let dialog = $state<HTMLDialogElement>();
+
+	type InfoTab = 'stats' | 'interactions' | 'evolution';
+	const infoTabs: { id: InfoTab; label: string; icon: IconName }[] = [
+		{ id: 'stats', label: 'Stats', icon: 'stats' },
+		{ id: 'interactions', label: 'Interacts with', icon: 'interact' },
+		{ id: 'evolution', label: 'Evolution', icon: 'evolve' }
+	];
+	let infoTab = $state<InfoTab>('stats');
 	let width = $state(1024);
 	let height = $state(768);
 
@@ -168,8 +178,18 @@
 							<TypeBadge {force} />
 						{/each}
 					</div>
-					<SectionLabel>Stats</SectionLabel>
-					<StatBars {particle} />
+					<VerticalTabs tabs={infoTabs} bind:value={infoTab} label="Particle details">
+						{#snippet children(tab)}
+							<SectionLabel>{infoTabs.find((t) => t.id === tab)?.label}</SectionLabel>
+							{#if tab === 'stats'}
+								<StatBars {particle} />
+							{:else if tab === 'interactions'}
+								<InteractionList {particle} {onselect} />
+							{:else}
+								<EvolutionList {particle} {onselect} />
+							{/if}
+						{/snippet}
+					</VerticalTabs>
 				</GlassCard>
 				{#if canStep}
 					<p class="hint">

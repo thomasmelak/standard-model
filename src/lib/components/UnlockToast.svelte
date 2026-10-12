@@ -67,7 +67,8 @@
 	.region {
 		position: fixed;
 		right: 1rem;
-		bottom: 1rem;
+		/* Above the bottom tab bar on portrait phones. */
+		bottom: calc(1rem + var(--tabbar-h, 0px));
 		z-index: 900;
 	}
 

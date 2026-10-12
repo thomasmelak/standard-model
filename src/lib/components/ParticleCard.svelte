@@ -1,24 +1,21 @@
 <script lang="ts">
 	import Equation from './Equation.svelte';
-	import Orb from './Orb.svelte';
+	import EvolutionList from './EvolutionList.svelte';
+	import InteractionList from './InteractionList.svelte';
 	import ParticleStage from './ParticleStage.svelte';
 	import ParticleSymbol from './ParticleSymbol.svelte';
 	import ParticleViewer from './ParticleViewer.svelte';
 	import StatBars from './StatBars.svelte';
 	import TypeBadge from './TypeBadge.svelte';
-	import { hint } from '#lib/game/collection.ts';
-	import { game } from '#lib/game/store.svelte.ts';
 	import ViewModeToggle, { type ViewMode } from './ViewModeToggle.svelte';
-	import { Button, Chip, GlassCard, SectionLabel } from '#lib/ui/index.ts';
+	import { Button, GlassCard, SectionLabel } from '#lib/ui/index.ts';
 	import {
 		bindingEnergyMeV,
 		dexNumber,
 		formatFraction,
 		formatMass,
 		formatSpin,
-		getParticle,
 		particleEvolution,
-		particleInteractions,
 		particleMoves,
 		particleTypes,
 		type Force,
@@ -34,7 +31,6 @@
 	let { particle, onselect }: Props = $props();
 
 	const types = $derived(particleTypes(particle));
-	const interactions = $derived(particleInteractions(particle));
 	const moves = $derived(particleMoves(particle));
 	const evolution = $derived(particleEvolution(particle));
 	const leptonNumber = $derived(particle.leptonE + particle.leptonMu + particle.leptonTau);
@@ -42,18 +38,6 @@
 	let mode = $state<ViewMode>('orb');
 	let fullscreen = $state(false);
 </script>
-
-{#snippet chip(id: string)}
-	{@const p = getParticle(id)}
-	{#if game.isDiscovered(id)}
-		<Chip title={p.name} onclick={() => onselect?.(id)}>
-			<Orb particle={p} size={16} />
-			<span><ParticleSymbol symbol={p.symbol} /></span>
-		</Chip>
-	{:else}
-		<Chip locked title="Undiscovered. {hint(p)}">?</Chip>
-	{/if}
-{/snippet}
 
 {#snippet badge(force: Force)}
 	<TypeBadge {force} />
@@ -110,25 +94,7 @@
 
 		<section>
 			<SectionLabel>Interacts with</SectionLabel>
-			{#each interactions as i (i.force)}
-				<div class="interaction">
-					<div class="via">
-						{@render badge(i.force)}
-						<span class="muted"
-							>via {i.carriers
-								.map((id) => (id === 'W+' ? 'W±' : getParticle(id).symbol))
-								.join(', ')}</span
-						>
-					</div>
-					<div class="chips">
-						{#each i.partners as id (id)}
-							{@render chip(id)}
-						{/each}
-					</div>
-				</div>
-			{:else}
-				<p class="muted">Nothing — it is bound up inside the composites it forms.</p>
-			{/each}
+			<InteractionList {particle} {onselect} />
 		</section>
 
 		{#if moves.length}
@@ -151,26 +117,7 @@
 		{#if evolution.from || evolution.into.length}
 			<section>
 				<SectionLabel>Evolution</SectionLabel>
-				{#if evolution.from}
-					<div class="evo">
-						<span class="muted">Made from</span>
-						<div class="chips">
-							{#each evolution.from as id, i (i)}
-								{@render chip(id)}
-							{/each}
-						</div>
-					</div>
-				{/if}
-				{#if evolution.into.length}
-					<div class="evo">
-						<span class="muted">Fuses into</span>
-						<div class="chips">
-							{#each evolution.into as c (c.id)}
-								{@render chip(c.id)}
-							{/each}
-						</div>
-					</div>
-				{/if}
+				<EvolutionList {particle} {onselect} />
 			</section>
 		{/if}
 
@@ -282,26 +229,6 @@
 	section {
 		border-top: 1px solid var(--glass-line);
 		padding-top: 0.6rem;
-	}
-
-	.interaction,
-	.evo {
-		display: grid;
-		gap: 0.3rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.via {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.8rem;
-	}
-
-	.chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.3rem;
 	}
 
 	.moves {

@@ -7,3 +7,5 @@ export { default as GlassCard } from './GlassCard.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
 export { default as SectionLabel } from './SectionLabel.svelte';
 export { default as SegmentedControl } from './SegmentedControl.svelte';
+export { default as Icon, type IconName } from './Icon.svelte';
+export { default as VerticalTabs } from './VerticalTabs.svelte';
