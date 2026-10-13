@@ -8,8 +8,10 @@
 		isSolved,
 		startPuzzle,
 		stars,
+		type Puzzle,
 		type PuzzleAction
 	} from '#lib/game/puzzles.ts';
+	import { getRank, hasRank } from '#lib/game/ranks.ts';
 	import { getParticle } from '#lib/physics/index.ts';
 
 	// Puzzles: pick particles in the tray, then combine, split or react them
@@ -28,6 +30,9 @@
 	let showHint = $state(false);
 
 	const solved = $derived(isSolved(play, puzzle));
+	// Harder puzzles wait for a rank; the board shows what's needed instead of the tray.
+	const isOpen = (p: Puzzle) => hasRank(game.standing.rank, p.rank);
+	const locked = $derived(!isOpen(puzzle));
 	const best = $derived(game.collection.puzzles[puzzle.id]);
 	const selectedIds = $derived(selected.map((k) => play.tokens.find((t) => t.key === k)?.id ?? ''));
 	const canSplit = $derived(selectedIds.length === 1 && !getParticle(selectedIds[0]).elementary);
@@ -71,10 +76,11 @@
 			size="sm"
 			variant={p.id === puzzle.id ? 'primary' : 'secondary'}
 			aria-current={p.id === puzzle.id ? 'true' : undefined}
-			title={p.title}
+			title={isOpen(p) ? p.title : `${p.title} (needs ${getRank(p.rank!).name})`}
 			onclick={() => open(p.id)}
 		>
 			{i + 1}
+			{#if !isOpen(p)}<span aria-label="locked">🔒</span>{/if}
 			<span class="stars" aria-label={score ? `${stars(score, p.par)} stars` : 'not solved'}>
 				{score ? starText(stars(score, p.par)) : '·'}
 			</span>
@@ -94,63 +100,71 @@
 		</div>
 	</header>
 
-	<p class="score">
-		Moves <strong>{play.moves}</strong> · Par <strong>{puzzle.par}</strong>
-		{#if best}· Best <strong>{best}</strong>{/if}
-	</p>
-
-	<div class="tray" role="group" aria-label="Your particles">
-		{#each play.tokens as t (t.key)}
-			<span class="token">
-				<ParticleTile
-					particle={getParticle(t.id)}
-					compact
-					selected={selected.includes(t.key)}
-					onclick={() => toggle(t.key)}
-				/>
-			</span>
-		{/each}
-	</div>
-
-	{#if solved}
-		<div class="solved" role="status">
-			<strong>Solved in {play.moves} {play.moves === 1 ? 'move' : 'moves'}!</strong>
-			<span class="big-stars" aria-label="{stars(play.moves, puzzle.par)} stars"
-				>{starText(stars(play.moves, puzzle.par))}</span
-			>
-			<div class="actions">
-				{#if play.moves > puzzle.par}
-					<Button onclick={restart}>Try for par</Button>
-				{/if}
-				{#if next}
-					<Button variant="primary" onclick={() => open(next.id)}>Next puzzle</Button>
-				{/if}
-			</div>
-		</div>
+	{#if locked}
+		{@const need = getRank(puzzle.rank!)}
+		<p class="locked">
+			{need.icon} Reach <strong>{need.name}</strong> ({need.xp} XP) to play this puzzle. You have
+			{game.standing.xp} XP: discover particles, finish quests and solve the open puzzles to earn more.
+		</p>
 	{:else}
-		<div class="actions">
-			<Button
-				variant="primary"
-				disabled={selected.length < 2}
-				onclick={() => run({ type: 'combine', keys: selected })}>Combine</Button
-			>
-			<Button disabled={!canSplit} onclick={() => run({ type: 'split', key: selected[0] })}
-				>Split</Button
-			>
-			<Button disabled={!selected.length} onclick={() => run({ type: 'react', keys: selected })}
-				>React</Button
-			>
-			<Button variant="ghost" onclick={restart}>Restart</Button>
-			<Button variant="ghost" onclick={() => (showHint = !showHint)}>Hint</Button>
-		</div>
-		<p class="help muted">Tap particles to select them, then pick an action.</p>
-	{/if}
+		<p class="score">
+			Moves <strong>{play.moves}</strong> · Par <strong>{puzzle.par}</strong>
+			{#if best}· Best <strong>{best}</strong>{/if}
+		</p>
 
-	{#if message && !solved}
-		<p class="message" class:bad={!message.ok} aria-live="polite">{message.text}</p>
-	{/if}
-	{#if showHint && !solved}
-		<p class="hint">💡 {puzzle.hint}</p>
+		<div class="tray" role="group" aria-label="Your particles">
+			{#each play.tokens as t (t.key)}
+				<span class="token">
+					<ParticleTile
+						particle={getParticle(t.id)}
+						compact
+						selected={selected.includes(t.key)}
+						onclick={() => toggle(t.key)}
+					/>
+				</span>
+			{/each}
+		</div>
+
+		{#if solved}
+			<div class="solved" role="status">
+				<strong>Solved in {play.moves} {play.moves === 1 ? 'move' : 'moves'}!</strong>
+				<span class="big-stars" aria-label="{stars(play.moves, puzzle.par)} stars"
+					>{starText(stars(play.moves, puzzle.par))}</span
+				>
+				<div class="actions">
+					{#if play.moves > puzzle.par}
+						<Button onclick={restart}>Try for par</Button>
+					{/if}
+					{#if next}
+						<Button variant="primary" onclick={() => open(next.id)}>Next puzzle</Button>
+					{/if}
+				</div>
+			</div>
+		{:else}
+			<div class="actions">
+				<Button
+					variant="primary"
+					disabled={selected.length < 2}
+					onclick={() => run({ type: 'combine', keys: selected })}>Combine</Button
+				>
+				<Button disabled={!canSplit} onclick={() => run({ type: 'split', key: selected[0] })}
+					>Split</Button
+				>
+				<Button disabled={!selected.length} onclick={() => run({ type: 'react', keys: selected })}
+					>React</Button
+				>
+				<Button variant="ghost" onclick={restart}>Restart</Button>
+				<Button variant="ghost" onclick={() => (showHint = !showHint)}>Hint</Button>
+			</div>
+			<p class="help muted">Tap particles to select them, then pick an action.</p>
+		{/if}
+
+		{#if message && !solved}
+			<p class="message" class:bad={!message.ok} aria-live="polite">{message.text}</p>
+		{/if}
+		{#if showHint && !solved}
+			<p class="hint">💡 {puzzle.hint}</p>
+		{/if}
 	{/if}
 </GlassCard>
 
@@ -188,6 +202,10 @@
 		justify-items: center;
 		gap: var(--space-1);
 		font-size: 0.75rem;
+	}
+
+	.locked {
+		margin: var(--space-3) 0 0;
 	}
 
 	.score {

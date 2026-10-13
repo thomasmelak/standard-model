@@ -5,7 +5,8 @@
 	import { game } from '#lib/game/store.svelte.ts';
 	import { getParticle } from '#lib/physics/index.ts';
 
-	// Celebrates one unlock at a time: a new particle, a completed quest or a new badge. Each stays
+	// Celebrates one unlock at a time: a new particle, a completed quest, a new badge or a
+	// promotion. Each stays
 	// a few seconds, or until clicked.
 
 	const current = $derived(game.unlocks[0]);
@@ -46,6 +47,12 @@
 								<strong>Quest complete!</strong>
 								<span>{current.quest.title}</span>
 								<a href={resolve('/challenges')}>See your quests</a>
+							</div>
+						{:else if current.rank}
+							<span class="medal" aria-hidden="true">{current.rank.icon}</span>
+							<div>
+								<strong>Promoted: {current.rank.name}!</strong>
+								<span>{current.rank.perk}</span>
 							</div>
 						{:else if current.badge}
 							<span class="medal" aria-hidden="true">🏅</span>

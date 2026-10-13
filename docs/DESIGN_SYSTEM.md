@@ -56,7 +56,8 @@ and particle tiles use the same glass recipe tinted with the particle's colour.
 
 ## Navigation
 
-- **Desktop and landscape:** text links in the glass header.
+- **Desktop and landscape:** text links in the glass header. The rank chip (`RankChip`) sits
+  beside the theme toggle on every screen size; under 600px it shows only the icon and level.
 - **Portrait up to 900px:** the header keeps the brand and theme toggle, and the links move to a
   frosted **bottom tab bar** of icons (Particles, Lab, Forces, Play for Challenges, and Dex with a
   discovered count). It

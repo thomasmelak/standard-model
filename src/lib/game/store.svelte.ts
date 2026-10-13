@@ -11,6 +11,8 @@ import {
 	type Collection
 } from './collection';
 import { newQuests, type Quest } from './quests';
+import type { Rank } from './ranks';
+import { promotions, standing } from './xp';
 
 // The player's collection, saved in this browser. Server rendering and the
 // first paint see an empty collection; the save loads on the client.
@@ -19,10 +21,11 @@ const KEY = 'standard-model:collection';
 
 export interface Unlock {
 	key: number;
-	/** A newly discovered particle, a newly earned badge or a completed quest. */
+	/** A newly discovered particle, a completed quest, a new badge or a promotion. */
 	particle?: string;
 	badge?: Badge;
 	quest?: Quest;
+	rank?: Rank;
 }
 
 let collection = $state<Collection>(EMPTY);
@@ -39,7 +42,8 @@ function commit(next: Collection, newParticles: string[] = []) {
 		...unlocks,
 		...newParticles.map((particle) => ({ key: nextKey++, particle })),
 		...newQuests(before, next).map((quest) => ({ key: nextKey++, quest })),
-		...newBadges(before, next).map((badge) => ({ key: nextKey++, badge }))
+		...newBadges(before, next).map((badge) => ({ key: nextKey++, badge })),
+		...promotions(before, next).map((rank) => ({ key: nextKey++, rank }))
 	];
 }
 
@@ -65,6 +69,10 @@ export const game = {
 	},
 	get progress() {
 		return progress(game.collection);
+	},
+	/** XP, rank and progress to the next rank. */
+	get standing() {
+		return standing(game.collection);
 	},
 	isDiscovered(id: string) {
 		return isDiscovered(game.collection, id);
