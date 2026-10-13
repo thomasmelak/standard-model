@@ -1,4 +1,6 @@
 import { allParticles, getParticle, reactions, type Particle } from '#lib/physics/index.ts';
+import { BALANCE_QUESTIONS } from './balance';
+import { PUZZLES } from './puzzles';
 
 // The particle collection: what the player has discovered, and the badges that
 // follow from it. Pure functions over a plain, serialisable save object.
@@ -10,9 +12,19 @@ export interface Collection {
 	particles: string[];
 	/** Ids of reactions the player has run, in discovery order. */
 	reactions: string[];
+	/** Best (fewest) moves for each solved puzzle. Added in phase 2; older saves lack it. */
+	puzzles: Record<string, number>;
+	/** Ids of balance questions answered correctly. Added in phase 2. */
+	balanced: string[];
 }
 
-export const EMPTY: Collection = { version: 1, particles: [], reactions: [] };
+export const EMPTY: Collection = {
+	version: 1,
+	particles: [],
+	reactions: [],
+	puzzles: {},
+	balanced: []
+};
 
 /** Elementary particles are known from the start; composites must be built. */
 export function startsUnlocked(particle: Particle): boolean {
@@ -43,12 +55,25 @@ export function discover(c: Collection, ids: string[], reactionId?: string): Dis
 		particles: [...c.particles, ...newParticles],
 		reactions: [...c.reactions, ...newReaction]
 	};
-	const before = new Set(earnedBadges(c).map((b) => b.id));
-	return {
-		collection: next,
-		newParticles,
-		newBadges: earnedBadges(next).filter((b) => !before.has(b.id))
-	};
+	return { collection: next, newParticles, newBadges: newBadges(c, next) };
+}
+
+/** Badges earned between two versions of the collection. */
+export function newBadges(before: Collection, after: Collection): Badge[] {
+	const had = new Set(earnedBadges(before).map((b) => b.id));
+	return earnedBadges(after).filter((b) => !had.has(b.id));
+}
+
+/** Records a solved puzzle, keeping the best (fewest) moves. */
+export function solvePuzzle(c: Collection, id: string, moves: number): Collection {
+	const best = c.puzzles[id];
+	if (best !== undefined && best <= moves) return c;
+	return { ...c, puzzles: { ...c.puzzles, [id]: moves } };
+}
+
+/** Records a correctly balanced reaction. */
+export function balance(c: Collection, id: string): Collection {
+	return c.balanced.includes(id) ? c : { ...c, balanced: [...c.balanced, id] };
 }
 
 export interface Progress {
@@ -69,7 +94,10 @@ export interface Badge {
 }
 
 interface BadgeRule extends Badge {
-	/** Everything that must be discovered: particle ids, or reaction ids prefixed "reaction:". */
+	/**
+	 * Everything that must be done: particle ids, or ids prefixed "reaction:", "puzzle:" or
+	 * "balance:" for a reaction run, a puzzle solved or a reaction balanced.
+	 */
 	requires: string[];
 }
 
@@ -102,6 +130,18 @@ export const BADGES: BadgeRule[] = [
 		requires: reactions.map((r) => `reaction:${r.id}`)
 	},
 	{
+		id: 'puzzles',
+		name: 'Puzzle Master',
+		description: 'Solve every puzzle.',
+		requires: PUZZLES.map((p) => `puzzle:${p.id}`)
+	},
+	{
+		id: 'balance',
+		name: 'Perfect Balance',
+		description: 'Balance every reaction.',
+		requires: BALANCE_QUESTIONS.map((q) => `balance:${q.id}`)
+	},
+	{
 		id: 'complete',
 		name: 'Theory of Almost Everything',
 		description: 'Discover every particle and reaction.',
@@ -110,9 +150,11 @@ export const BADGES: BadgeRule[] = [
 ];
 
 function has(c: Collection, item: string): boolean {
-	return item.startsWith('reaction:')
-		? c.reactions.includes(item.slice('reaction:'.length))
-		: isDiscovered(c, item);
+	const [kind, id] = item.split(/:(.*)/);
+	if (id === undefined) return isDiscovered(c, item);
+	if (kind === 'reaction') return c.reactions.includes(id);
+	if (kind === 'puzzle') return Object.hasOwn(c.puzzles, id);
+	return c.balanced.includes(id);
 }
 
 /** How many of a badge's requirements are met. */
@@ -144,12 +186,24 @@ export function parseCollection(raw: string | null): Collection {
 		}
 		const known = new Set(allParticles.map((p) => p.id));
 		const knownReactions = new Set(reactions.map((r) => r.id));
+		const knownQuestions = new Set(BALANCE_QUESTIONS.map((q) => q.id));
+		const puzzles: Record<string, number> = {};
+		if (data.puzzles && typeof data.puzzles === 'object') {
+			for (const p of PUZZLES) {
+				const moves = data.puzzles[p.id];
+				if (Number.isInteger(moves) && moves > 0) puzzles[p.id] = moves;
+			}
+		}
 		return {
 			version: 1,
 			particles: data.particles.filter((id: unknown) => typeof id === 'string' && known.has(id)),
 			reactions: data.reactions.filter(
 				(id: unknown) => typeof id === 'string' && knownReactions.has(id)
-			)
+			),
+			puzzles,
+			balanced: Array.isArray(data.balanced)
+				? data.balanced.filter((id: unknown) => typeof id === 'string' && knownQuestions.has(id))
+				: []
 		};
 	} catch {
 		return EMPTY;

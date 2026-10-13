@@ -9,10 +9,19 @@ src/
 ├── routes/                  Pages (all prerendered via +layout.ts)
 │   ├── +page.svelte         /              The Standard Model table
 │   ├── lab/                 /lab           The Particle Lab
-│   └── interactions/        /interactions  The four interactions and who feels them
+│   ├── interactions/        /interactions  The four interactions and who feels them
+│   ├── challenges/          /challenges    Quests, puzzles and "balance the reaction"
+│   ├── dex/                 /dex           The particle dex and badges
+│   └── design/              /design        Live design-system reference
 └── lib/
     ├── ui/                  Design system components (GlassCard, Button, …) — docs/DESIGN_SYSTEM.md
     ├── components/          Svelte UI: ParticleCard, ParticleTile, Orb, OrbCanvas, ThemeToggle, …
+    ├── game/                Game rules over the physics, plain tested TypeScript — docs/GAMIFICATION.md
+    │   ├── collection.ts    The save: discoveries, puzzle bests, balanced reactions; badges
+    │   ├── quests.ts        Quest checklist, read off the collection
+    │   ├── puzzles.ts       Puzzle levels and their combine / split / react rules
+    │   ├── balance.ts       "Balance the reaction" questions and their wrong choices
+    │   └── store.svelte.ts  The reactive store: loads and saves, queues unlock pop-ups
     └── physics/             Framework-free TypeScript, unit-tested with Vitest
         ├── types.ts         Particle, Reaction, Force, quantum numbers
         ├── elementary.ts    The 17 elementary particles + generated antiparticles
@@ -24,7 +33,7 @@ src/
         └── stats.ts         Card stats, types, interactions, moves and evolutions
 ```
 
-Dependencies point one way: **routes → components → physics**. The physics library knows nothing
+Dependencies point one way: **routes → components → game → physics**. The physics library knows nothing
 about Svelte, so every physics rule can be tested without a browser, and new particles or
 reactions are added as data.
 
