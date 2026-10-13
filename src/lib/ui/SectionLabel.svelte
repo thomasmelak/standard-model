@@ -11,10 +11,11 @@
 <style>
 	.label {
 		margin: 0 0 var(--space-2);
-		font-size: 0.8rem;
-		font-weight: 600;
+		font-family: var(--font-display);
+		font-size: 0.7rem;
+		font-weight: 500;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.1em;
 		color: var(--muted);
 	}
 </style>

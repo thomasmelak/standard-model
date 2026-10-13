@@ -21,7 +21,7 @@
 		</dd>
 	{/each}
 	<dt>Total</dt>
-	<dd><strong>{total}</strong></dd>
+	<dd><strong class="total">{total}</strong></dd>
 </dl>
 
 <style>
@@ -50,8 +50,13 @@
 
 	.value {
 		text-align: right;
-		font-variant-numeric: tabular-nums;
-		font-size: 0.85rem;
+		font-family: var(--font-mono);
+		font-size: 0.95rem;
+	}
+
+	.total {
+		font-family: var(--font-mono);
+		font-size: 1rem;
 	}
 
 	.meaning {

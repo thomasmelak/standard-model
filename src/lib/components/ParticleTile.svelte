@@ -125,7 +125,8 @@
 		position: absolute;
 		top: 0.25rem;
 		left: 0.4rem;
-		font-size: 0.7rem;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
 		color: var(--muted);
 	}
 
@@ -168,7 +169,8 @@
 	}
 
 	.mass {
-		font-size: 0.65rem;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
 		color: var(--muted);
 	}
 </style>

@@ -27,6 +27,30 @@
 	];
 	const forces: Force[] = ['strong', 'electromagnetic', 'weak', 'higgs'];
 	let segment = $state<'orb' | 'parts' | 'fundamental'>('orb');
+
+	const fonts = [
+		{
+			token: '--font-display',
+			family: 'Orbitron',
+			size: '1.6rem',
+			sample: 'Up Quark #001',
+			use: 'Headings, the brand, section labels'
+		},
+		{
+			token: '--font-body',
+			family: 'Exo 2',
+			size: '1rem',
+			sample: 'Two up quarks and a down quark make a proton.',
+			use: 'Everything you read, and particle symbols (it has the Greek fallbacks)'
+		},
+		{
+			token: '--font-mono',
+			family: 'Share Tech Mono',
+			size: '1.2rem',
+			sample: '172.57 GeV/c² · 333 · 30/53',
+			use: 'Numbers: stats, masses, charges, dex counts'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -47,6 +71,21 @@
 				<span style:background={`var(--${name})`}></span>
 				<code>--{name}</code>
 			</div>
+		{/each}
+	</div>
+</section>
+
+<section>
+	<h2>Type</h2>
+	<div class="type">
+		{#each fonts as f (f.token)}
+			<GlassCard padding="sm">
+				<code>{f.token}</code> · {f.family}
+				<p class="sample" style:font-family={`var(${f.token})`} style:font-size={f.size}>
+					{f.sample}
+				</p>
+				<span class="muted">{f.use}</span>
+			</GlassCard>
 		{/each}
 	</div>
 </section>
@@ -152,6 +191,15 @@
 		width: 1.6rem;
 		height: 1.6rem;
 		border-radius: var(--radius-sm);
+	}
+
+	.type {
+		display: grid;
+		gap: var(--space-3);
+	}
+
+	.sample {
+		margin: var(--space-2) 0;
 	}
 
 	.cards {

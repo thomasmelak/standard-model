@@ -238,6 +238,7 @@
 	}
 
 	.dex {
+		font-family: var(--font-mono);
 		font-size: 0.85rem;
 		color: var(--muted);
 	}

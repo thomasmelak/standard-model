@@ -46,12 +46,13 @@
 	--glass-shadow: 0 8px 24px rgb(31 35 40 / 0.1);
 	--glass-reflection: rgb(255 255 255 / 0.55);
 
-	font-family:
-		system-ui,
-		-apple-system,
-		'Segoe UI',
-		Roboto,
-		sans-serif;
+	/* Type: Orbitron for display, Exo 2 for reading, Share Tech Mono for numbers.
+	   Self-hosted from @fontsource (imported in +layout.svelte). Greek symbols fall back. */
+	--font-display: 'Orbitron', 'Exo 2', system-ui, sans-serif;
+	--font-body: 'Exo 2', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--font-mono: 'Share Tech Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+	font-family: var(--font-body);
 	line-height: 1.5;
 }
 
@@ -142,10 +143,25 @@ a {
 	color: var(--accent);
 }
 
+/* Headings use the display face. Orbitron runs wide, so h1 is a touch smaller than default. */
 h1,
 h2,
 h3 {
+	font-family: var(--font-display);
+	font-weight: 700;
 	line-height: 1.2;
+	letter-spacing: 0.02em;
+}
+
+h1 {
+	font-size: 1.8rem;
+}
+
+/* Particle symbols stay in the body face: the display and mono faces have no Greek. */
+code,
+kbd,
+samp {
+	font-family: var(--font-mono);
 }
 
 button {

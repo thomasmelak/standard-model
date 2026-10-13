@@ -159,11 +159,13 @@
 	.dex {
 		font-size: 0.8rem;
 		color: var(--muted);
-		font-variant-numeric: tabular-nums;
+		font-family: var(--font-mono);
 	}
 
+	/* Orbitron runs wide: shrink on narrow phones so "electron antineutrino" stays on one line. */
 	h2 {
 		margin: 0;
+		font-size: clamp(1.1rem, 5vw, 1.5rem);
 		text-transform: capitalize;
 		white-space: nowrap;
 	}
