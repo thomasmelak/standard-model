@@ -56,11 +56,37 @@ How it is built (`/challenges`, logic in `src/lib/game/`):
 
 ## Phase 3 — XP and ranks
 
-- **XP** for first discoveries, quests, puzzles and streaks of reactions without a conservation
-  violation.
-- **Ranks:** Student → Lab Technician → Researcher → Nobel Laureate.
-- **Gated unlocks** by rank (heavy quarks, harder puzzles), giving a
-  natural learning order.
+- **XP** for first discoveries, quests, puzzles, balanced reactions and badges.
+- **Ranks:** Student → Lab Technician → Researcher → Professor → Nobel Laureate.
+- **Gated unlocks** by rank: the harder puzzles, giving a natural learning order.
+
+How it is built (`src/lib/game/xp.ts`, `ranks.ts`):
+
+- **XP is derived, never stored.** `totalXp(collection)` adds it up from the save every time, so it
+  can't drift, and players with phase 1 or 2 saves get their XP at once.
+
+  | Source              | XP                   |
+  | ------------------- | -------------------- |
+  | Particle discovered | 20                   |
+  | Move discovered     | 15                   |
+  | Quest complete      | 50                   |
+  | Puzzle solved       | 30, plus 10 per star |
+  | Reaction balanced   | 10                   |
+  | Badge earned        | 100                  |
+
+  Everything done at par is 2330 XP.
+
+- **Ranks:** Student (0), Lab Technician (150), Researcher (500), Professor (1100), Nobel Laureate
+  (1900). Nobel needs most of the game but not every last point.
+- **Gates:** the nuclear puzzles (deuteron, heavy hydrogen) need Lab Technician; Stellar Forge needs
+  Researcher. A locked puzzle shows what it needs and how much XP you have. A test checks that the
+  open puzzles and the lab alone earn enough XP to open every gate.
+- **Where it shows:** a rank chip in the header (icon and level, plus the name on wider screens)
+  links to the rank card at the top of the dex: XP, a bar to the next rank, where the XP came from,
+  and the whole ladder. A promotion pops up with the rank's perk.
+- **Decided against:** gating heavy quarks (every elementary particle stays unlocked, and quests need
+  the strange quark) and reaction streaks (the lab only runs real, conserving reactions, so a
+  streak could never break).
 
 ## Phase 4 — Battles
 

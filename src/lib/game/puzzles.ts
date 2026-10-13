@@ -5,6 +5,7 @@ import {
 	getParticle,
 	split
 } from '#lib/physics/index.ts';
+import type { RankId } from './ranks';
 
 // Puzzles: a fixed set of starting particles and a target to make from them,
 // using the lab's own rules. Scored by the number of successful actions.
@@ -19,6 +20,8 @@ export interface Puzzle {
 	/** The fewest actions that solve it. */
 	par: number;
 	hint: string;
+	/** The rank needed to play it; open to everyone when absent. */
+	rank?: RankId;
 }
 
 export const PUZZLES: Puzzle[] = [
@@ -74,7 +77,8 @@ export const PUZZLES: Puzzle[] = [
 		start: ['u', 'u', 'd', 'u', 'd', 'd'],
 		target: 'D',
 		par: 3,
-		hint: 'A deuteron is one proton and one neutron, held by the strong force.'
+		hint: 'A deuteron is one proton and one neutron, held by the strong force.',
+		rank: 'technician'
 	},
 	{
 		id: 'heavy-hydrogen',
@@ -83,7 +87,8 @@ export const PUZZLES: Puzzle[] = [
 		start: ['u', 'u', 'd', 'u', 'd', 'd', 'e-'],
 		target: 'D-atom',
 		par: 4,
-		hint: 'Proton, neutron, deuteron, then add the electron.'
+		hint: 'Proton, neutron, deuteron, then add the electron.',
+		rank: 'technician'
 	},
 	{
 		id: 'helium',
@@ -92,7 +97,8 @@ export const PUZZLES: Puzzle[] = [
 		start: ['u', 'u', 'd', 'u', 'u', 'd', 'u', 'd', 'd', 'u', 'd', 'd', 'e-', 'e-'],
 		target: 'He-atom',
 		par: 6,
-		hint: 'Two protons and two neutrons make an alpha particle; it holds two electrons.'
+		hint: 'Two protons and two neutrons make an alpha particle; it holds two electrons.',
+		rank: 'researcher'
 	}
 ];
 

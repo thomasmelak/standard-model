@@ -2,6 +2,7 @@
 	import Equation from '#lib/components/Equation.svelte';
 	import ParticleCard from '#lib/components/ParticleCard.svelte';
 	import ParticleTile from '#lib/components/ParticleTile.svelte';
+	import RankCard from '#lib/components/RankCard.svelte';
 	import TypeBadge from '#lib/components/TypeBadge.svelte';
 	import { Button, GlassCard, ProgressBar } from '#lib/ui/index.ts';
 	import { resolve } from '$app/paths';
@@ -43,6 +44,8 @@
 	first time you build them in the <a href={resolve('/lab')}>Particle Lab</a>, and every reaction
 	you run is recorded as a move.
 </p>
+
+<div class="rank" id="rank"><RankCard /></div>
 
 <GlassCard as="section" class="dex-progress">
 	<div class="progress-head">
@@ -128,6 +131,11 @@
 </div>
 
 <style>
+	.rank {
+		margin-bottom: 1.5rem;
+		scroll-margin-top: 5rem;
+	}
+
 	:global(.dex-progress) {
 		display: grid;
 		gap: 0.6rem;

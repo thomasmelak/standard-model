@@ -7,6 +7,7 @@
 	import '@fontsource/share-tech-mono/400.css';
 	import '../app.css';
 	import favicon from '#lib/assets/favicon.svg';
+	import RankChip from '#lib/components/RankChip.svelte';
 	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 	import UnlockToast from '#lib/components/UnlockToast.svelte';
 	import { game } from '#lib/game/store.svelte.ts';
@@ -56,7 +57,10 @@
 			</a>
 		{/each}
 	</nav>
-	<ThemeToggle />
+	<div class="header-tools">
+		<RankChip />
+		<ThemeToggle />
+	</div>
 </header>
 
 <main>
@@ -116,6 +120,12 @@
 		align-items: center;
 		gap: 1rem;
 		margin-left: auto;
+	}
+
+	.header-tools {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
 	}
 
 	header nav a {

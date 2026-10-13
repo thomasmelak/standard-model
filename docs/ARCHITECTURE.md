@@ -21,6 +21,8 @@ src/
     │   ├── quests.ts        Quest checklist, read off the collection
     │   ├── puzzles.ts       Puzzle levels and their combine / split / react rules
     │   ├── balance.ts       "Balance the reaction" questions and their wrong choices
+    │   ├── ranks.ts         The five ranks and their XP thresholds
+    │   ├── xp.ts            XP worked out from the save, and the player's standing
     │   └── store.svelte.ts  The reactive store: loads and saves, queues unlock pop-ups
     └── physics/             Framework-free TypeScript, unit-tested with Vitest
         ├── types.ts         Particle, Reaction, Force, quantum numbers
