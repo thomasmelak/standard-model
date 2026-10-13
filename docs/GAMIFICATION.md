@@ -94,7 +94,8 @@ How it is built (`src/lib/game/xp.ts`, `ranks.ts`):
   - A force only affects particles that feel it: a neutrino is immune to Electric moves.
   - HP is stability: unstable particles can decay mid-battle.
   - Matter against antimatter can end in annihilation.
-- This is the largest phase and gets its own design document before any code.
+- This is the largest phase and gets its own design document before any code:
+  [BATTLES.md](BATTLES.md).
 
 ## Phase 5 — Daily play
 
