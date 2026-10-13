@@ -67,5 +67,7 @@ and particle tiles use the same glass recipe tinted with the particle's colour.
   parent needs `:global(.your-class)`, since Svelte scopes styles per component.
 - `shine` is for one featured thing per view (the particle card, the full-screen stats, an
   unlock pop-up, an earned badge); everywhere else, plain or `glow`.
+- Glass and `shine` look the same on phones and desktops: no breakpoint switches them off. Only
+  `prefers-reduced-motion` stops the animated glint and sheen.
 - When writing CSS with `-webkit-` prefixes, put the prefixed line **first**: the minifier keeps only
   the last of a pair, and Chrome needs the standard one (`backdrop-filter`, `mask-composite`).

@@ -8,7 +8,7 @@ Every phase is a separate PR. Game logic lives in `src/lib/game/` as plain, unit
 Svelte components only display it. Progress is saved in the browser (`localStorage`), so the site
 stays static on GitHub Pages with no accounts or backend.
 
-## Phase 1 — Collection (in progress)
+## Phase 1 — Collection (done)
 
 - **Particle dex** (`/dex`): every particle in the game, in card order. Undiscovered particles show as
   dark silhouettes with a hint, not their name.
@@ -26,7 +26,7 @@ stays static on GitHub Pages with no accounts or backend.
   missing, corrupt or unavailable save means a fresh start, never a crash. The dex has a "Reset
   progress" button.
 
-## Phase 2 — Challenges
+## Phase 2 — Challenges (in progress)
 
 - **Quests:** a checklist of goals such as "Make a proton", "Make a hydrogen atom", "Turn a neutron
   into a proton" (beta decay) and "Annihilate matter with antimatter".

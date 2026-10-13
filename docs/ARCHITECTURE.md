@@ -89,8 +89,11 @@ real physics in `stats.ts`, scaled to 0–100:
 - The ⤢ button on a card opens `ParticleViewer.svelte`: a modal `<dialog>` with a large live orb,
   which also requests browser full screen where allowed, with the stat bars (`StatBars.svelte`,
   shared with the card) beside it. ‹ › buttons, the ← → keys and horizontal swipes (on the orb's stage or the stats card) step through
-  discovered particles in dex order, wrapping around. In landscape the stats sit beside the orb
-  (30vw, at least 240px); in portrait they stack below it (90vw), on a frosted-glass card whose vertical icon tabs switch between Stats,
+  discovered particles in dex order, wrapping around. Antiparticles are always part of the
+  sequence (each follows its particle), since they start unlocked and are worth comparing side by
+  side. In landscape the stats sit beside the orb
+  (30vw, at least 240px); in portrait they stack below it (90vw). At every size they sit on the
+  same shining frosted-glass card, whose vertical icon tabs switch between Stats,
   Interacts with and Evolution. Dragging inside the orb orbits the
   camera around it (the shader's `view` uniform rotates the fog, while the light stays put), with
   momentum on release; double-click resets. Drags outside the sphere stay swipes. Esc or ✕ closes it.
