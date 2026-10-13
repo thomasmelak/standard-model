@@ -15,10 +15,26 @@ component live, in whichever theme is active.
 | Glass      | `--glass-tint`, `--glass-tint-2`, `--glass-edge`, `--glass-line`, `--glass-shadow`, `--glass-reflection`, `--blur-glass` | Milky white in light, smoky in dark                 |
 | Shape      | `--radius-sm` 8px, `--radius-md` 12px, `--radius-lg` 16px, `--radius-pill`                                               |                                                     |
 | Spacing    | `--space-1` … `--space-5` (0.25, 0.5, 0.75, 1, 1.5rem)                                                                   |                                                     |
+| Type       | `--font-display` Orbitron, `--font-body` Exo 2, `--font-mono` Share Tech Mono                                            | See Typography                                      |
 | Motion     | `--ease-out`                                                                                                             | All animation is off under `prefers-reduced-motion` |
 
 `.on-dark` re-scopes the text and glass tokens to their dark values for surfaces that stay dark in
 both themes: the full-screen viewer and a card's art window.
+
+## Typography
+
+A "fun space game" set, self-hosted from `@fontsource` packages (imported at the top of
+`src/routes/+layout.svelte`), so the site needs no third-party font requests.
+
+| Token            | Face            | Weights       | Used for                                         |
+| ---------------- | --------------- | ------------- | ------------------------------------------------ |
+| `--font-display` | Orbitron        | 500, 700      | `h1`–`h3`, the brand, `SectionLabel`             |
+| `--font-body`    | Exo 2           | 400, 600, 700 | Body text, buttons, particle symbols             |
+| `--font-mono`    | Share Tech Mono | 400           | Numbers: stat values, masses, charges, dex count |
+
+Orbitron and Share Tech Mono have no Greek, so particle symbols (γ, ν, μ, τ, π) stay in the body
+face. Orbitron runs wide: the card title shrinks with the viewport (`clamp`) so the longest name,
+"electron antineutrino", fits on one line on a 360px phone.
 
 ## Components (`src/lib/ui`)
 

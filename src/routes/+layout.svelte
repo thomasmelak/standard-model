@@ -1,4 +1,10 @@
 <script lang="ts">
+	import '@fontsource/orbitron/500.css';
+	import '@fontsource/orbitron/700.css';
+	import '@fontsource/exo-2/400.css';
+	import '@fontsource/exo-2/600.css';
+	import '@fontsource/exo-2/700.css';
+	import '@fontsource/share-tech-mono/400.css';
 	import '../app.css';
 	import favicon from '#lib/assets/favicon.svg';
 	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
@@ -92,7 +98,9 @@
 	}
 
 	.brand {
+		font-family: var(--font-display);
 		font-weight: 700;
+		letter-spacing: 0.02em;
 		color: var(--text);
 		text-decoration: none;
 	}
@@ -187,7 +195,8 @@
 		border-radius: var(--radius-pill);
 		background: var(--accent-strong);
 		color: var(--on-accent);
-		font-size: 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
 		line-height: 1.1rem;
 		text-align: center;
 	}
@@ -207,8 +216,8 @@
 		padding: 0 0.4rem;
 		border-radius: var(--radius-pill);
 		background: var(--surface-2);
-		font-size: 0.75rem;
-		font-variant-numeric: tabular-nums;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
 	}
 
 	header nav a[aria-current='page'] {
