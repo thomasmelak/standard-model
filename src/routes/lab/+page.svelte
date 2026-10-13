@@ -14,8 +14,7 @@
 		formatFraction,
 		getParticle,
 		sumQuantumNumbers,
-		type ConservationCheck,
-		type Particle
+		type ConservationCheck
 	} from '#lib/physics/index.ts';
 
 	interface BenchItem {
@@ -35,7 +34,6 @@
 	}
 
 	let nextKey = 0;
-	let showAntiparticles = $state(false);
 	let bench = $state<BenchItem[]>([]);
 	let inspectedId = $state<string | undefined>();
 	let log = $state<LogEntry[]>([]);
@@ -46,9 +44,6 @@
 	const reaction = $derived(benchIds.length ? findReaction(benchIds) : undefined);
 	const splittable = $derived(bench.length === 1 && !getParticle(bench[0].id).elementary);
 
-	const isAnti = (p: Particle) =>
-		p.baryon3 < 0 || p.leptonE + p.leptonMu + p.leptonTau < 0 || p.id === 'W-';
-
 	const headings = {
 		quark: 'Quarks',
 		lepton: 'Leptons',
@@ -58,16 +53,15 @@
 		atom: 'Atoms'
 	} as const;
 
-	const palette = $derived(
-		(['quark', 'lepton', 'gauge-boson', 'hadron', 'nucleus', 'atom'] as const).map((category) => ({
+	// Antiparticles always appear, each right after its particle.
+	const palette = (['quark', 'lepton', 'gauge-boson', 'hadron', 'nucleus', 'atom'] as const).map(
+		(category) => ({
 			category,
 			particles: allParticles.filter(
 				(p) =>
-					(p.category === category ||
-						(category === 'gauge-boson' && p.category === 'scalar-boson')) &&
-					(showAntiparticles || !isAnti(p))
+					p.category === category || (category === 'gauge-boson' && p.category === 'scalar-boson')
 			)
-		}))
+		})
 	);
 
 	/** Replaces the bench; anything new that appears on it joins the collection. */
@@ -158,10 +152,7 @@
 
 <div class="layout">
 	<GlassCard as="section" data-drop="palette">
-		<header class="palette-head">
-			<h2>Particles</h2>
-			<label><input type="checkbox" bind:checked={showAntiparticles} /> Antiparticles</label>
-		</header>
+		<h2>Particles</h2>
 		{#each palette as group (group.category)}
 			<h3>{headings[group.category]}</h3>
 			<div class="grid">
@@ -277,12 +268,6 @@
 	.right {
 		display: grid;
 		gap: 1rem;
-	}
-
-	.palette-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
 	}
 
 	h2 {

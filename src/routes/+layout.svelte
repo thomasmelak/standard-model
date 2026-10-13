@@ -235,5 +235,7 @@
 		max-width: 1100px;
 		margin: 0 auto;
 		padding: 1.5rem 1rem 3rem;
+		/* Orb glows may spill past the screen edge; clip them so phones never scroll sideways. */
+		overflow-x: clip;
 	}
 </style>

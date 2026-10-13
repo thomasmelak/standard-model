@@ -36,7 +36,7 @@ export const QUESTS: Quest[] = [
 	{
 		id: 'make-meson',
 		title: 'Make a meson',
-		description: 'Pair a quark with an antiquark. Tick "Antiparticles" in the lab to find them.',
+		description: 'Pair a quark with an antiquark, like u with anti-d.',
 		make: ['pi+', 'pi-', 'pi0', 'K+']
 	},
 	{

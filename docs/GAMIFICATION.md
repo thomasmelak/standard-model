@@ -59,7 +59,7 @@ How it is built (`/challenges`, logic in `src/lib/game/`):
 - **XP** for first discoveries, quests, puzzles and streaks of reactions without a conservation
   violation.
 - **Ranks:** Student → Lab Technician → Researcher → Nobel Laureate.
-- **Gated unlocks** by rank (antiparticles in the palette, heavy quarks, harder puzzles), giving a
+- **Gated unlocks** by rank (heavy quarks, harder puzzles), giving a
   natural learning order.
 
 ## Phase 4 — Battles

@@ -42,7 +42,9 @@ reactions are added as data.
 - **Quantum numbers in thirds.** Electric charge and baryon number are stored ×3 (`charge3`,
   `baryon3`) so an up quark is `charge3: 2, baryon3: 1` and all arithmetic stays in integers.
 - **Antiparticles are generated.** Each fermion (and the W⁺) is declared once; its antiparticle is
-  derived with every additive quantum number negated.
+  derived with every additive quantum number negated. Antiparticles are shown everywhere, never
+  behind a toggle: an antimatter table under the home table, the lab palette, the dex, the
+  forces table and full-screen browsing, each one right after its particle.
 - **Composites derive their quantum numbers.** `composites.ts` lists only constituents, mass and
   spin. `particles.ts` sums the constituents' charge, baryon and lepton numbers, so a proton's
   +1 charge is computed from u + u + d rather than written down.

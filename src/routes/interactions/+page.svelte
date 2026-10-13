@@ -49,11 +49,15 @@
 		}
 	];
 
-	// Column by column: each generation's quarks and leptons, then the bosons.
+	// Column by column: each generation's quarks and leptons, then the bosons. Every
+	// antiparticle follows its particle: it feels exactly the same forces.
 	const particles = [0, 1, 2, 3, 4].flatMap((c) =>
 		standardModelTable
 			.flatMap((row) => (row[c] ? [getParticle(row[c])] : []))
 			.filter((p): p is ElementaryParticle => p.elementary)
+			.flatMap((p) =>
+				p.antiparticleId === p.id ? [p] : [p, getParticle(p.antiparticleId) as ElementaryParticle]
+			)
 	);
 </script>
 
