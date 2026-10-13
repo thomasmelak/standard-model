@@ -30,11 +30,29 @@ stays static on GitHub Pages with no accounts or backend.
 
 - **Quests:** a checklist of goals such as "Make a proton", "Make a hydrogen atom", "Turn a neutron
   into a proton" (beta decay) and "Annihilate matter with antimatter".
-- **Puzzles:** a fixed set of starting particles and a target, e.g. "You have u u d d d e⁻ — make a
-  neutral atom". Scored by fewest actions.
+- **Puzzles:** a fixed set of starting particles and a target, e.g. "You have u u d e⁻ — make a
+  hydrogen atom". Scored by fewest actions.
 - **Balance the reaction:** a reaction with one particle missing; pick the one that conserves
   charge, baryon number and lepton numbers. The existing conservation checker is the referee.
 - **Hints** on failed attempts reuse the lab notebook's explanations (colour confinement and so on).
+
+How it is built (`/challenges`, logic in `src/lib/game/`):
+
+- **11 quests** (`quests.ts`) are read straight off the collection: "make X" is done once X is
+  discovered, "run R" once the reaction is recorded. Quests reached before phase 2 count at once.
+  Completing one pops up a "Quest complete!" toast wherever it happens.
+- **8 puzzles** (`puzzles.ts`), from "First proton" (par 1) to "Stellar forge" (helium from 12
+  quarks and 2 electrons, par 6). Pick particles in the tray, then Combine, Split or React. Only
+  successful actions count; a failed one explains why and costs nothing. Stars: 3 at par, 2 within
+  two moves of it, 1 otherwise. Things made in a puzzle join the dex like lab discoveries. A unit
+  test plays every puzzle at par.
+- **19 balance questions** (`balance.ts`), one per distinct product of every reaction. The three
+  wrong choices each break a conservation law (the answer's antiparticle first when it has one),
+  and a test checks that exactly one choice conserves everything. A wrong pick lists each broken
+  law with its before and after totals.
+- **Save:** the collection gains `puzzles` (best moves per puzzle) and `balanced` (question ids).
+  Phase 1 saves load with both empty.
+- **Badges:** "Puzzle Master" (solve every puzzle) and "Perfect Balance" (balance every reaction).
 
 ## Phase 3 — XP and ranks
 

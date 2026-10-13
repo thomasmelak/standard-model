@@ -27,6 +27,12 @@
 			short: 'Forces',
 			icon: 'interact' as IconName
 		},
+		{
+			href: resolve('/challenges'),
+			label: 'Challenges',
+			short: 'Play',
+			icon: 'target' as IconName
+		},
 		{ href: resolve('/dex'), label: 'Dex', short: 'Dex', icon: 'cards' as IconName }
 	];
 
@@ -142,7 +148,7 @@
 			left: 0;
 			z-index: 60;
 			display: grid;
-			grid-template-columns: repeat(4, 1fr);
+			grid-template-columns: repeat(5, 1fr);
 			height: var(--tabbar-h);
 			padding-bottom: calc(0.35rem + env(safe-area-inset-bottom));
 			border-top: 1px solid var(--glass-line);

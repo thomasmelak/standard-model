@@ -16,6 +16,9 @@
 		// Evolution: one splitting into a composite
 		evolve:
 			'M6 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M18 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M8 6l8 5 M8 18l8-5',
+		// Challenges: a target
+		target:
+			'M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0',
 		// Moves: a lightning bolt
 		bolt: 'M13 2 4 14h7l-1 8 9-12h-7z'
 	} as const;

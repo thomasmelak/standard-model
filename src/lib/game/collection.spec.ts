@@ -87,6 +87,12 @@ describe('parseCollection', () => {
 			particles: ['p', 'unobtainium', 3],
 			reactions: ['x']
 		});
-		expect(parseCollection(raw)).toEqual({ version: 1, particles: ['p'], reactions: [] });
+		expect(parseCollection(raw)).toEqual({
+			version: 1,
+			particles: ['p'],
+			reactions: [],
+			puzzles: {},
+			balanced: []
+		});
 	});
 });

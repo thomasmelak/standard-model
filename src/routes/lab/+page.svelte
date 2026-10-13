@@ -9,6 +9,7 @@
 		allParticles,
 		checkConservation,
 		combine,
+		explainNoBoundState,
 		findReaction,
 		formatFraction,
 		getParticle,
@@ -106,21 +107,10 @@
 		}
 		record({
 			title: 'No bound state',
-			detail: explainFailure(ids),
+			detail: explainNoBoundState(ids),
 			inputs: ids,
 			ok: false
 		});
-	}
-
-	function explainFailure(ids: string[]): string {
-		const q = sumQuantumNumbers(ids);
-		if (q.baryon3 % 3 !== 0) {
-			return 'Colour confinement: quarks only exist in colour-neutral groups — three quarks (a baryon) or a quark and an antiquark (a meson).';
-		}
-		if (ids.some((id) => getParticle(id).category === 'gauge-boson')) {
-			return 'Force carriers are exchanged between particles; they are not building blocks of matter.';
-		}
-		return 'This combination is not one of the bound states in the lab yet. Try u+u+d, p+n or p+e⁻.';
 	}
 
 	function doSplit() {
