@@ -66,8 +66,16 @@
 		min-height: 6.5rem;
 		padding: 0.5rem 0.25rem;
 		border: 2px solid color-mix(in srgb, var(--tile-color) 55%, transparent);
-		border-radius: 10px;
-		background: color-mix(in srgb, var(--tile-color) 14%, var(--surface));
+		border-radius: var(--radius-md);
+		/* Glass tinted with the particle's colour, like a GlassCard with a glow. */
+		background:
+			radial-gradient(120% 70% at 0% 0%, var(--glass-reflection), transparent 55%),
+			linear-gradient(
+				135deg,
+				color-mix(in srgb, var(--tile-color) 16%, var(--glass-tint)),
+				color-mix(in srgb, var(--tile-color) 8%, var(--glass-tint-2))
+			);
+		box-shadow: inset 0 1px 0 var(--glass-edge);
 		transition:
 			transform 0.1s,
 			border-color 0.1s;

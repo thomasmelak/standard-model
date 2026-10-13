@@ -25,6 +25,27 @@
 	--weak: #0969da;
 	--higgs: #8250df;
 
+	/* Design system (see docs/DESIGN_SYSTEM.md). Shape and spacing don't change by theme. */
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--radius-pill: 999px;
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.5rem;
+	--blur-glass: 14px;
+	--ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+	/* Glass, light theme: milky white panes on the pale page. */
+	--glass-tint: rgb(255 255 255 / 0.62);
+	--glass-tint-2: rgb(255 255 255 / 0.35);
+	--glass-edge: rgb(255 255 255 / 0.95);
+	--glass-line: rgb(31 35 40 / 0.1);
+	--glass-shadow: 0 8px 24px rgb(31 35 40 / 0.1);
+	--glass-reflection: rgb(255 255 255 / 0.55);
+
 	font-family:
 		system-ui,
 		-apple-system,
@@ -62,6 +83,12 @@
 		--electromagnetic: #e3b341;
 		--weak: #58a6ff;
 		--higgs: #a371f7;
+		--glass-tint: rgb(255 255 255 / 0.07);
+		--glass-tint-2: rgb(255 255 255 / 0.02);
+		--glass-edge: rgb(255 255 255 / 0.3);
+		--glass-line: rgb(255 255 255 / 0.12);
+		--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+		--glass-reflection: rgb(255 255 255 / 0.14);
 	}
 }
 
@@ -91,6 +118,12 @@
 	--electromagnetic: #e3b341;
 	--weak: #58a6ff;
 	--higgs: #a371f7;
+	--glass-tint: rgb(255 255 255 / 0.07);
+	--glass-tint-2: rgb(255 255 255 / 0.02);
+	--glass-edge: rgb(255 255 255 / 0.3);
+	--glass-line: rgb(255 255 255 / 0.12);
+	--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+	--glass-reflection: rgb(255 255 255 / 0.14);
 }
 
 *,
@@ -121,35 +154,22 @@ button {
 	cursor: pointer;
 }
 
-.btn {
-	padding: 0.45rem 0.9rem;
-	border: 1px solid var(--border);
-	border-radius: 6px;
-	background: var(--surface-2);
-}
-
-.btn:hover:not(:disabled) {
-	border-color: var(--accent);
-}
-
-.btn:disabled {
-	opacity: 0.45;
-	cursor: not-allowed;
-}
-
-.btn.primary {
-	background: var(--accent-strong);
-	border-color: var(--accent-strong);
-	color: var(--on-accent);
-}
-
-.panel {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	padding: 1rem;
-}
-
 .muted {
 	color: var(--muted);
+}
+
+/* Surfaces that stay dark in both themes (the full-screen viewer, a card's art
+   window): components inside them take the dark-theme glass and text tokens. */
+.on-dark {
+	--text: #e6edf3;
+	--muted: rgb(255 255 255 / 0.65);
+	--border: rgb(255 255 255 / 0.2);
+	--surface-2: rgb(255 255 255 / 0.08);
+	--glass-tint: rgb(255 255 255 / 0.07);
+	--glass-tint-2: rgb(255 255 255 / 0.02);
+	--glass-edge: rgb(255 255 255 / 0.3);
+	--glass-line: rgb(255 255 255 / 0.14);
+	--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.4);
+	--glass-reflection: rgb(255 255 255 / 0.14);
+	color: var(--text);
 }

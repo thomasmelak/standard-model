@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Equation from '#lib/components/Equation.svelte';
+	import { GlassCard } from '#lib/ui/index.ts';
 	import ParticleSymbol from '#lib/components/ParticleSymbol.svelte';
 	import {
 		getParticle,
@@ -65,52 +66,54 @@
 
 <div class="forces">
 	{#each forces as f (f.force)}
-		<section class="panel" style:--f={`var(--${f.force})`}>
-			<h2>{f.force}</h2>
+		<GlassCard as="section" glow={`var(--${f.force})`}>
+			<h2 style:color={`var(--${f.force})`}>{f.force}</h2>
 			<p>{f.summary}</p>
 			<p class="muted">
 				Carrier: <strong>{getParticle(f.carrier).name}</strong> · Relative strength: {f.strength}
 				· Range: {f.range}
 			</p>
-		</section>
+		</GlassCard>
 	{/each}
 </div>
 
 <h2>Who feels what</h2>
-<div class="scroll">
-	<table>
-		<thead>
-			<tr>
-				<th>Particle</th>
-				{#each forces as f (f.force)}
-					<th style:color={`var(--${f.force})`}>{f.force}</th>
-				{/each}
-			</tr>
-		</thead>
-		<tbody>
-			{#each particles as p (p.id)}
+<GlassCard padding="sm">
+	<div class="scroll">
+		<table>
+			<thead>
 				<tr>
-					<td
-						><strong><ParticleSymbol symbol={p.symbol} /></strong>
-						<span class="name">{p.name}</span></td
-					>
+					<th>Particle</th>
 					{#each forces as f (f.force)}
-						<td class="cell">{p.forces.includes(f.force) ? '●' : ''}</td>
+						<th style:color={`var(--${f.force})`}>{f.force}</th>
 					{/each}
 				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+			</thead>
+			<tbody>
+				{#each particles as p (p.id)}
+					<tr>
+						<td
+							><strong><ParticleSymbol symbol={p.symbol} /></strong>
+							<span class="name">{p.name}</span></td
+						>
+						{#each forces as f (f.force)}
+							<td class="cell">{p.forces.includes(f.force) ? '●' : ''}</td>
+						{/each}
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+</GlassCard>
 
 <h2>Example processes</h2>
 <ul class="reactions">
 	{#each reactions as r (r.id)}
-		<li class="panel" style:--f={`var(--${r.force})`}>
+		<GlassCard as="li" glow={`var(--${r.force})`}>
 			<strong>{r.name}</strong>
 			<div class="equation"><Equation inputs={r.inputs} outputs={r.outputs} /></div>
 			<span class="muted">{r.description}</span>
-		</li>
+		</GlassCard>
 	{/each}
 </ul>
 
@@ -121,15 +124,9 @@
 		gap: 1rem;
 	}
 
-	.forces section,
-	.reactions li {
-		border-left: 4px solid var(--f);
-	}
-
 	.forces h2 {
 		margin-top: 0;
 		text-transform: capitalize;
-		color: var(--f);
 	}
 
 	.scroll {
@@ -144,7 +141,7 @@
 	th,
 	td {
 		padding: 0.4rem 0.75rem;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--glass-line);
 		text-align: left;
 	}
 

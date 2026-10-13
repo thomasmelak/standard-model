@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+	import { SegmentedControl } from '#lib/ui/index.ts';
 	import { getParticle, type Particle } from '#lib/physics/index.ts';
 
 	// Orb / Parts / Quarks & leptons switch for composite particles. Hidden for
@@ -29,39 +30,5 @@
 </script>
 
 {#if !particle.elementary}
-	<div class="toggle" role="radiogroup" aria-label="Show">
-		{#each options as o (o.value)}
-			<button
-				type="button"
-				role="radio"
-				aria-checked={mode === o.value}
-				class:on={mode === o.value}
-				onclick={() => (mode = o.value)}>{o.label}</button
-			>
-		{/each}
-	</div>
+	<SegmentedControl {options} bind:value={mode} label="Show" />
 {/if}
-
-<style>
-	.toggle {
-		display: inline-flex;
-		padding: 2px;
-		border-radius: 999px;
-		background: rgb(0 0 0 / 0.45);
-		border: 1px solid rgb(255 255 255 / 0.15);
-	}
-
-	button {
-		padding: 0.15rem 0.6rem;
-		border: none;
-		border-radius: 999px;
-		background: none;
-		color: rgb(255 255 255 / 0.75);
-		font-size: 0.75rem;
-	}
-
-	button.on {
-		background: rgb(255 255 255 / 0.18);
-		color: white;
-	}
-</style>

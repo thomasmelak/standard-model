@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Orb from './Orb.svelte';
+	import { Button, GlassCard } from '#lib/ui/index.ts';
 	import { resolve } from '$app/paths';
 	import { game } from '#lib/game/store.svelte.ts';
 	import { getParticle } from '#lib/physics/index.ts';
@@ -20,30 +21,43 @@
 <div class="region" aria-live="polite">
 	{#if current}
 		{#key current.key}
-			<div class="toast" class:badge={current.badge}>
-				{#if current.particle}
-					{@const p = getParticle(current.particle)}
-					<span class="burst" style:--c={`var(--${p.category})`}
-						><Orb particle={p} size={56} /></span
-					>
-					<div>
-						<strong>New discovery!</strong>
-						<span class="name">{p.name}</span>
-						<a href={resolve('/dex')}>Added to your dex</a>
-					</div>
-				{:else if current.badge}
-					<span class="medal" aria-hidden="true">🏅</span>
-					<div>
-						<strong>Badge earned: {current.badge.name}</strong>
-						<span class="name">{current.badge.description}</span>
-					</div>
-				{/if}
-				<button
-					type="button"
-					class="close"
-					aria-label="Dismiss"
-					onclick={() => game.dismiss(current.key)}>✕</button
+			<div class="pop">
+				<GlassCard
+					glow={current.particle
+						? `var(--${getParticle(current.particle).category})`
+						: 'var(--electromagnetic)'}
+					shine
+					padding="none"
 				>
+					<div class="toast">
+						{#if current.particle}
+							{@const p = getParticle(current.particle)}
+							<span class="burst" style:--c={`var(--${p.category})`}
+								><Orb particle={p} size={56} /></span
+							>
+							<div>
+								<strong>New discovery!</strong>
+								<span class="name">{p.name}</span>
+								<a href={resolve('/dex')}>Added to your dex</a>
+							</div>
+						{:else if current.badge}
+							<span class="medal" aria-hidden="true">🏅</span>
+							<div>
+								<strong>Badge earned: {current.badge.name}</strong>
+								<span class="name">{current.badge.description}</span>
+							</div>
+						{/if}
+						<span class="close">
+							<Button
+								icon
+								size="sm"
+								variant="ghost"
+								aria-label="Dismiss"
+								onclick={() => game.dismiss(current.key)}>✕</Button
+							>
+						</span>
+					</div>
+				</GlassCard>
 			</div>
 		{/key}
 	{/if}
@@ -53,25 +67,22 @@
 	.region {
 		position: fixed;
 		right: 1rem;
-		bottom: 1rem;
+		/* Above the bottom tab bar on portrait phones. */
+		bottom: calc(1rem + var(--tabbar-h, 0px));
 		z-index: 900;
 	}
 
+	.pop {
+		animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+	}
+
 	.toast {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 0.9rem;
 		min-width: 260px;
 		padding: 0.75rem 2.4rem 0.75rem 0.9rem;
-		border: 1px solid var(--border);
-		border-radius: 14px;
-		background: var(--surface);
-		box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
-		animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
-	}
-
-	.toast.badge {
-		border-color: var(--electromagnetic);
 	}
 
 	.toast > div {
@@ -108,11 +119,8 @@
 
 	.close {
 		position: absolute;
-		top: 0.4rem;
-		right: 0.5rem;
-		border: none;
-		background: none;
-		color: var(--muted);
+		top: 0.3rem;
+		right: 0.3rem;
 	}
 
 	@keyframes pop {
@@ -133,7 +141,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.toast,
+		.pop,
 		.burst,
 		.medal {
 			animation: none;
