@@ -1,6 +1,7 @@
 import type { RankId } from '../ranks';
 
-// Rivals: fixed, themed teams, each teaching one idea. Unlocked by rank.
+// Rivals: fixed, themed teams, each teaching one idea, in order of difficulty
+// (measured by the balance test: the share of elementary-only teams that win).
 
 export interface Rival {
 	id: string;
@@ -12,45 +13,45 @@ export interface Rival {
 
 export const RIVALS: Rival[] = [
 	{
-		id: 'leptons',
-		name: 'Lepton Lab Assistant',
-		team: ['e-', 'mu-', 'nu_e'],
+		id: 'top',
+		name: 'The Top',
+		team: ['t', 'b', 'alpha'],
 		rank: 'student',
-		lesson: 'Charge, and why neutrinos shrug off almost everything.'
+		lesson: 'Heavy quarks hit hard but decay within turns: t → b → c → s → u.'
+	},
+	{
+		id: 'leptons',
+		name: 'Charged Leptons',
+		team: ['e-', 'mu-', 'tau-'],
+		rank: 'student',
+		lesson: 'Leptons have no colour: the strong force passes them by.'
+	},
+	{
+		id: 'nuclear',
+		name: 'Nuclear Family',
+		team: ['p', 'n', 'alpha'],
+		rank: 'technician',
+		lesson: 'The residual strong force, the neutral neutron and a doubly charged nucleus.'
 	},
 	{
 		id: 'photons',
 		name: 'The Photon Club',
 		team: ['gamma', 'e+', 'pi0'],
-		rank: 'student',
-		lesson: 'Massless particles are fastest; antimatter annihilates.'
+		rank: 'technician',
+		lesson: 'Massless particles strike first; matter meets antimatter.'
 	},
 	{
 		id: 'quarks',
 		name: 'Quark Gang',
 		team: ['u', 'd', 's'],
-		rank: 'technician',
-		lesson: 'Colour and the strong force.'
-	},
-	{
-		id: 'nuclear',
-		name: 'Nuclear Pair',
-		team: ['p', 'n', 'D'],
-		rank: 'technician',
-		lesson: 'The residual strong force, and the neutral neutron.'
+		rank: 'researcher',
+		lesson: 'Quarks feel every force: colour, charge, weak and Higgs.'
 	},
 	{
 		id: 'heavyweights',
 		name: 'Heavyweights',
 		team: ['W+', 'Z', 'H'],
-		rank: 'researcher',
-		lesson: 'The heaviest bosons live for a single turn.'
-	},
-	{
-		id: 'top',
-		name: 'The Top',
-		team: ['t', 'b', 'alpha'],
 		rank: 'professor',
-		lesson: 'The decay cascade, and a doubly charged nucleus.'
+		lesson: 'The heaviest bosons decay in one turn, into particles that fight on.'
 	}
 ];

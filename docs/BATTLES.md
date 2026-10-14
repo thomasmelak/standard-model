@@ -1,7 +1,7 @@
 # Battle design (phase 4)
 
-Status: **design, not built yet**. This document is for review before any code. The open questions
-at the end need answers first.
+Status: **milestone 1 (engine) built**; the battle tab and rewards come next. The decisions at the
+end are settled. Where building and balance testing changed the first draft, this document says so.
 
 ## Goals
 
@@ -29,7 +29,7 @@ Each battle stat comes from a card stat, so the card is the battle manual.
 | Battle stat     | From the card  | Rule                                                                                                     |
 | --------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
 | **HP**          | HP (stability) | `60 + 0.4 × HP`, so 60–100. A stable electron has 100; a top quark has 63.                               |
-| **Power**       | Power (mass)   | Multiplies damage: `0.6 + Power / 100`. Massless particles hit at 0.6×, a top quark at about 1.6×.       |
+| **Power**       | Power (mass)   | Multiplies damage: `0.9 + Power / 500`. Massless particles hit at 0.9×, a top quark at about 1.1×.       |
 | **Speed**       | Speed          | The faster side acts first. Massless particles (Speed 100) always go first. Ties are broken by the seed. |
 | **Decay clock** | Lifetime       | See below. Stable particles have none.                                                                   |
 | **Moves**       | Types          | One move per force the particle takes part in, as below.                                                 |
@@ -72,12 +72,31 @@ card, so the card shows which moves a particle has.
 | **Mass Surge**   | Higgs           | —    | Self: +20 Power for 3 turns                                                                                          | The Higgs coupling grows with mass, so massless particles can't use it.                                                                             |
 | **Annihilate**   | —               | —    | Only when the active particle faces its own antiparticle                                                             | Both particles vanish into energy. A tactical sacrifice, and the matter/antimatter lesson.                                                          |
 
-**Damage** = `round(Base × (0.6 + Power / 100) × factor × spread)`, where `factor` is the multiplier
+**Damage** = `round(Base × (0.9 + Power / 500) × factor × spread)`, where `factor` is the multiplier
 from the table and `spread` is a seeded roll between 0.9 and 1.1. **Immunity** (factor 0) is the
 heart of the game. The UI greys out any move that can't affect the current target, and says why.
 
 The base values keep nature's order (strong > electromagnetic > weak) but flatten the real ratios
 (1 : 1/137 : 10⁻⁶) so every force is playable. The design page and the battle intro both say so.
+
+**Changed while building** (each found by the balance test, each also better physics):
+
+- **Mass matters less.** The first draft had Power range 0.6×–1.6×. Nucleons (stable, heavy) then
+  crushed every elementary team: no elementary team of the 4060 possible could beat p, n, D. Power
+  now spans 0.9×–1.1×, so fights turn on forces and charges, which is the lesson.
+- **Photons can be hit back.** The draft let a photon hit an electron while the electron could not
+  touch the photon (no charge). But it is one interaction: a charged particle scatters a photon
+  (Compton scattering). Photon Blast now hits a photon with factor = the attacker's |charge|.
+  Photons still pass through each other.
+- **The residual strong force is weak both ways.** Gluon Strike's factor is now
+  `colour(attacker) × colour(target)`: 1 between quarks and gluons, 0.5 when a hadron or nucleus is on
+  one side, 0.25 between two nucleons.
+- **No stalling.** If no particle left on either side can affect any particle on the other, and
+  none will decay, the battle ends at once on the share of HP left. A battle still going after 30
+  turns is a **draw**. A neutrino team used to "win" on HP after 40 turns of barely interacting,
+  which made neutrinos part of 64 teams that beat every rival.
+- **Faints:** a fainted particle is replaced at once by the next one standing, in team order. The
+  replacement doesn't act that turn.
 
 ### Other actions
 
@@ -89,9 +108,9 @@ The base values keep nature's order (strong > electromagnetic > weak) but flatte
 You send in **u** (HP 100, Power 21, Speed 79; moves: Gluon Strike, Photon Blast, W Exchange, Mass
 Surge). The rival has **e⁻** (HP 100, Power 11, Speed 89).
 
-1. The electron is faster, so it goes first. Its Photon Blast: 22 × 0.71 × (1 × ⅔) ≈ **10**. Your
+1. The electron is faster, so it goes first. Its Photon Blast: 22 × 0.92 × (1 × ⅔) ≈ **14**. Your
    Gluon Strike is greyed out: "An electron has no colour; the strong force can't touch it."
-2. You use Photon Blast: 22 × 0.81 × (⅔ × 1) ≈ **12**.
+2. You use Photon Blast: 22 × 0.94 × (⅔ × 1) ≈ **14**.
 3. The rival switches to **ν_e**. Now your Photon Blast is greyed out too ("No electric charge"), and
    only W Exchange works. The lesson is that neutrinos only feel the weak force.
 
@@ -100,14 +119,20 @@ Surge). The rival has **e⁻** (HP 100, Power 11, Speed 89).
 Rivals are fixed teams with a theme, unlocked by rank (phase 3). Facing a particle in battle does
 **not** discover it: the player still has to build it in the lab.
 
-| Rival                | Team        | Needs          | Lesson                                  |
-| -------------------- | ----------- | -------------- | --------------------------------------- |
-| Lepton Lab Assistant | e⁻, μ⁻, ν_e | Student        | Charge and neutrinos                    |
-| The Photon Club      | γ, e⁺, π⁰   | Student        | Massless speed; annihilation            |
-| Quark Gang           | u, d, s     | Lab Technician | Colour; the strong force                |
-| Nuclear Pair         | p, n, D     | Lab Technician | Residual strong force; neutral neutrons |
-| Heavyweights         | W⁺, Z, H    | Researcher     | One-turn clocks                         |
-| The Top              | t, b, α     | Professor      | The decay cascade; charge 2             |
+Rivals are ordered by **measured** difficulty: the share of the 4060 possible elementary-only teams
+that beat them (a fixed sample, greedy play on both sides). The test checks the order holds.
+
+| Rival           | Team       | Needs          | Teams that win | Lesson                                         |
+| --------------- | ---------- | -------------- | -------------- | ---------------------------------------------- |
+| The Top         | t, b, α    | Student        | 92%            | Heavy quarks decay within turns: t → b → c → s |
+| Charged Leptons | e⁻, μ⁻, τ⁻ | Student        | 40%            | No colour: the strong force passes them by     |
+| Nuclear Family  | p, n, α    | Lab Technician | 31%            | Residual strong force; the neutral neutron     |
+| The Photon Club | γ, e⁺, π⁰  | Lab Technician | 22%            | Massless particles strike first; antimatter    |
+| Quark Gang      | u, d, s    | Researcher     | 22%            | Quarks feel every force                        |
+| Heavyweights    | W⁺, Z, H   | Professor      | 7%             | One-turn bosons decay into fighters            |
+
+The draft's order guessed wrong: The Top was meant to be the hardest but decays into easy prey, and
+the neutrino in the first lepton team made it a wall.
 
 **AI:** greedy and deterministic. It picks the move with the most expected damage, and switches when
 its active particle is immune to everything it can do. It uses Mass Surge when it can't do damage,
@@ -125,17 +150,17 @@ and Annihilate only when its own particle has less HP left (as a fraction) than 
 ```
 src/lib/game/battle/
 ├── rules.ts     Battle stats, moves, immunity, damage, decay table: pure functions
-├── engine.ts    createBattle(seed, teamA, teamB) and step(state, action): returns a new state and an event list
+├── engine.ts    createBattle(seed, teamA, teamB) and step(state, a0, a1): a new state and an event list
 ├── ai.ts        The rival's choice of action for a state
 ├── rivals.ts    The rival teams and their rank gates
 └── random.ts    A small seeded PRNG (mulberry32), so a seed replays a battle exactly
 ```
 
 - **State is a plain object; `step` never mutates it.** The UI keeps the current state in `$state`
-  and plays `events` (`attack`, `immune`, `damage`, `decay`, `faint`, `switch`, `annihilate`, `win`)
-  as animations and log lines.
-- **Route:** a fourth **Battle** tab on `/challenges`. That keeps the nav at five tabs (open
-  question 1).
+  and plays `events` (`move`, `immune`, `damage`, `clock`, `surge`, `decay`, `annihilate`, `faint`,
+  `switch`, `end`) as animations and log lines. `step` takes both sides' actions; the UI gets the
+  rival's from `chooseAction` in `ai.ts`.
+- **Route:** a fourth **Battle** tab on `/challenges`, keeping the nav at five tabs.
 - **Layout:** the rival is at the top and you are at the bottom, each with a live `OrbCanvas`, an HP
   `ProgressBar` and decay-clock pips. Move buttons sit in a 2×2 grid, each with its `TypeBadge`, and
   the log runs in a `GlassCard`. In portrait the layout stacks; in landscape the sides sit next to
@@ -151,8 +176,9 @@ src/lib/game/battle/
   physics. Damage, the clock formula, and every decay product.
 - **Engine:** the same seed gives the same battle. Speed sets turn order. Decay keeps the HP fraction.
   Annihilate needs the exact antiparticle. A win ends the battle.
-- **Balance:** simulate greedy play to check that every rival can be beaten with particles available
-  at its rank, and that no single team beats every rival.
+- **Balance:** simulate greedy play over every possible elementary-only team (4060) to check that
+  each rival can be beaten, that no single team beats every rival, and that rivals get harder in
+  rank order.
 
 ## Milestones (one PR each)
 
@@ -160,13 +186,10 @@ src/lib/game/battle/
 2. **Battle tab:** team picker, battle screen and log, with the first two rivals.
 3. **Content and rewards:** the remaining rivals, battle XP, the Champion badge and docs.
 
-## Open questions
+## Decisions
 
-1. **Where battles live:** a Battle tab on `/challenges` (recommended, keeps five nav tabs) or their
-   own `/arena` page in the nav?
-2. **Randomness:** keep the ±10% damage spread for excitement, or make battles fully deterministic?
-3. **Team size:** three particles, or a choice of 1–3?
-4. **Ranks:** battles add up to 460 XP (6 × 60 + the Champion badge). Raise Nobel Laureate from 1900
-   to keep it as hard as now, or leave it?
-5. **Spoilers:** rivals field composites the player may not have built yet. Show them anyway (as
-   planned, without discovering them) or as silhouettes until built?
+1. **Where battles live:** a Battle tab on `/challenges`.
+2. **Randomness:** keep the seeded ±10% damage spread.
+3. **Team size:** exactly three.
+4. **Ranks:** raise Nobel Laureate to absorb the 460 battle XP (milestone 3).
+5. **Rivals' particles:** shown even if the player hasn't built them; facing one doesn't discover it.

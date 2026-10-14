@@ -25,7 +25,8 @@ export const MOVES: Record<MoveId, Move> = {
 		id: 'strong',
 		name: 'Gluon Strike',
 		base: 28,
-		summary: 'Colour against colour: full strength between quarks and gluons, half for each hadron or nucleus involved.'
+		summary:
+			'Colour against colour: full strength between quarks and gluons, half for each hadron or nucleus involved.'
 	},
 	electromagnetic: {
 		id: 'electromagnetic',
@@ -167,10 +168,7 @@ export function effect(move: MoveId, attackerId: string, targetId: string): Effe
 		case 'electromagnetic': {
 			// The photon couples to charge, so it hits charged particles and charged particles hit
 			// it back (Compton scattering). Two photons pass through each other.
-			const factor =
-				t.id === 'gamma'
-					? charge(a)
-					: (a.id === 'gamma' ? 1 : charge(a)) * charge(t);
+			const factor = t.id === 'gamma' ? charge(a) : (a.id === 'gamma' ? 1 : charge(a)) * charge(t);
 			if (factor) return { factor };
 			return {
 				factor: 0,
@@ -189,14 +187,12 @@ export function effect(move: MoveId, attackerId: string, targetId: string): Effe
 	}
 }
 
-/** How much a particle's Power (mass) multiplies its damage. */
-export const powerFactor = (p: number) => POWER_MIN + p * POWER_SLOPE;
-export let POWER_MIN = 0.6;
-export let POWER_SLOPE = 0.01;
-export function tune(min: number, slope: number) {
-	POWER_MIN = min;
-	POWER_SLOPE = slope;
-}
+/**
+ * How much a particle's Power (mass) multiplies its damage: 0.9× when massless up to about
+ * 1.1× for a top quark. Kept flat on purpose, so fights turn on forces and charges (the
+ * lesson) rather than on mass. Heavy particles' real edge is short-lived anyway.
+ */
+export const powerFactor = (p: number) => 0.9 + p / 500;
 
 /** Damage before the random spread. */
 export function baseDamage(move: MoveId, attackerId: string, targetId: string, surge = 0): number {

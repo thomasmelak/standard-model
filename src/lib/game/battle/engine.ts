@@ -19,8 +19,11 @@ import {
 
 export type SideId = 0 | 1;
 export const TEAM_SIZE = 3;
-/** A battle that runs this long is decided on remaining HP, so stalemates end. */
-export const MAX_TURNS = 40;
+/**
+ * A battle still going after this many turns is a draw: the two sides barely interact
+ * (think of neutrinos, which only feel the weak force), so neither can claim the win.
+ */
+export const MAX_TURNS = 30;
 
 export interface Fighter {
 	id: string;
@@ -98,8 +101,13 @@ export function legalActions(s: BattleState, side: SideId): Action[] {
 	return [...moves, ...switches, { type: 'forfeit' }];
 }
 
+const sameAction = (x: Action, y: Action) =>
+	x.type === y.type &&
+	(x.type !== 'move' || x.move === (y as typeof x).move) &&
+	(x.type !== 'switch' || x.to === (y as typeof x).to);
+
 const isLegal = (s: BattleState, side: SideId, a: Action) =>
-	legalActions(s, side).some((l) => JSON.stringify(l) === JSON.stringify(a));
+	legalActions(s, side).some((l) => sameAction(l, a));
 
 /** A working copy the turn can change freely. */
 const clone = (s: BattleState): BattleState => structuredClone(s);
@@ -176,19 +184,22 @@ export function step(
 	}
 
 	if (!settle(s, events)) {
-		if (deadlocked(s)) decide(s, events, 'stalemate');
-		else if (s.turn >= MAX_TURNS) decide(s, events, 'time');
+		if (deadlocked(s)) decide(s, events);
+		else if (s.turn >= MAX_TURNS) {
+			s.winner = 'draw';
+			events.push({ type: 'end', winner: 'draw', reason: 'time' });
+		}
 	}
 	return { state: s, events };
 }
 
-/** Ends the battle on the share of HP each side has left. */
-function decide(s: BattleState, events: BattleEvent[], reason: 'stalemate' | 'time') {
+/** Ends a battle nobody can progress on the share of HP each side has left. */
+function decide(s: BattleState, events: BattleEvent[]) {
 	const left = (side: SideId) =>
 		s.sides[side].team.reduce((sum, f) => sum + Math.max(0, f.hp) / f.maxHp, 0);
 	const d = left(0) - left(1);
 	s.winner = d > 0 ? 0 : d < 0 ? 1 : 'draw';
-	events.push({ type: 'end', winner: s.winner, reason });
+	events.push({ type: 'end', winner: s.winner, reason: 'stalemate' });
 }
 
 /**
